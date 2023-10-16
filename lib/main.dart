@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:uni_walker/bluetooth_connection/scanning_module.dart';
 
 void main() {
+  print("started");
   runApp(const MyApp());
+  const BluetoothScanner().startBluetooth();
 }
 
 class MyApp extends StatelessWidget {
