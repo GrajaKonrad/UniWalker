@@ -5,6 +5,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:uni_walker/domain/entities/device.dart';
 import 'package:uni_walker/domain/repositories/becon_repository.dart';
 import 'package:uni_walker/logger.dart';
+import 'dart:io' show Platform;
 
 class BeconRepositoryImpl implements BeconRepository {
   BeconRepositoryImpl()
@@ -18,7 +19,7 @@ class BeconRepositoryImpl implements BeconRepository {
 
   @override
   Future<void> initi() async {
-    FlutterBluePlus.setLogLevel(LogLevel.verbose, color: false);
+    FlutterBluePlus.setLogLevel(LogLevel.verbose, color: true);
 
     // check if bluetooth is supported
     if (await FlutterBluePlus.isSupported == false) {
@@ -34,8 +35,27 @@ class BeconRepositoryImpl implements BeconRepository {
       return;
     }
 
-    // start scanning
+    // make sure bluetooth is enabled
+    FlutterBluePlus.adapterState.listen((BluetoothAdapterState state) {
+      if (state == BluetoothAdapterState.on) {
+        _runScan();
+      } else {
+        stopScan();
+        //TODO: to be replaced by popup window
+        print("Bluetooth has been stopped");
+      }
+    });
+
+
+  }
+
+  Future<void> _runScan() async {
+    // wait for necessary actions
+    if (Platform.isAndroid) {
+      await FlutterBluePlus.turnOn();
+    }
     await FlutterBluePlus.startScan();
+    // start scanning
     _streamSubscription?.cancel();
     _streamSubscription = FlutterBluePlus.scanResults.listen(
       _deviceCallbeck,

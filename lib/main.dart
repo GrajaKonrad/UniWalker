@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:uni_walker/data/repositories/becon_repository_impl.dart';
 import 'package:uni_walker/data/repositories/becon_repository_mock.dart';
 import 'package:uni_walker/domain/repositories/becon_repository.dart';
 import 'package:uni_walker/domain/use_cases/becon_use_case.dart';
@@ -12,7 +13,7 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-  BeconRepository beconRepository = BeconRepositoryMock();
+  BeconRepository beconRepository = BeconRepositoryImpl();
 
   await Future.wait([
     beconRepository.initi(),
