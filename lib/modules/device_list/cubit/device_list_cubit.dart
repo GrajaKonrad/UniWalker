@@ -4,7 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 import 'package:uni_walker/domain/entities/entities.dart';
-import 'package:uni_walker/domain/use_cases/becon_use_case.dart';
+import 'package:uni_walker/domain/use_cases/beacon_use_case.dart';
 
 part 'device_list_state.dart';
 
