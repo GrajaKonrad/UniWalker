@@ -24,13 +24,19 @@ abstract class _$AppRouter extends RootStackRouter {
     DeviceListRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
-        child: const DeviceListView(),
+        child: WrappedRoute(child: const DeviceListView()),
       );
     },
     HomeRoute.name: (routeData) {
       return AutoRoutePage<dynamic>(
         routeData: routeData,
         child: const HomeView(),
+      );
+    },
+    MapRoute.name: (routeData) {
+      return AutoRoutePage<dynamic>(
+        routeData: routeData,
+        child: const MapView(),
       );
     },
   };
@@ -74,6 +80,20 @@ class HomeRoute extends PageRouteInfo<void> {
         );
 
   static const String name = 'HomeRoute';
+
+  static const PageInfo<void> page = PageInfo<void>(name);
+}
+
+/// generated route for
+/// [MapView]
+class MapRoute extends PageRouteInfo<void> {
+  const MapRoute({List<PageRouteInfo>? children})
+      : super(
+          MapRoute.name,
+          initialChildren: children,
+        );
+
+  static const String name = 'MapRoute';
 
   static const PageInfo<void> page = PageInfo<void>(name);
 }

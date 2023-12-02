@@ -34,6 +34,11 @@ class HomeView extends StatelessWidget {
                 onPressed: () => context.navigateTo(const DeviceListRoute()),
                 child: const Text('Bluetooth'),
               ),
+              const SizedBox(height: 8),
+              TextButton(
+                onPressed: () => context.navigateTo(const MapRoute()),
+                child: const Text('Mapa'),
+              ),
             ],
           ),
         ),
