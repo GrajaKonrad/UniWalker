@@ -1,4 +1,4 @@
-Name;Device_id;RSSI_at_1m;Pos_x;Pos_y;Pos_z;Device_floor
-"Anchor0";"DC:2C:6E:15:61:D8";-56;1;2;2;0
-"Anchor1";"DC:2C:6E:18:68:6D";-58;2;2;2;0
-"Anchor2";"DC:2C:6E:18:68:31";-56;3;2;2;0
+Device_id;Name;RSSI_at_1m;Pos_x;Pos_y;Pos_z;Device_floor
+"DC:2C:6E:15:61:D8";"Anchor0";-56;1;2;2;0
+"DC:2C:6E:18:68:6D";"Anchor1";-58;2;2;2;0
+"DC:2C:6E:18:68:31";"Anchor2";-56;3;2;2;0

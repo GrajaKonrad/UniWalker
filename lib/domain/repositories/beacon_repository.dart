@@ -7,4 +7,5 @@ abstract interface class BeconRepository {
   Future<void> initi();
   Future<void> startScan();
   Future<void> stopScan();
+  (double, double, int) deviceLocation();
 }
