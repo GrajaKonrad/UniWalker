@@ -2,8 +2,10 @@ import 'package:flutter/services.dart';
 
 class Obstacle {
   const Obstacle({
-    required this.vertices,
+    required this.a,
+    required this.b,
   });
 
-  final List<Offset> vertices;
+  final Offset a;
+  final Offset b;
 }
