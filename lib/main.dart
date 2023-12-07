@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
 import 'data/repositories/beacon_repository_impl.dart';
+import 'data/repositories/map_repository_impl.dart';
 import 'domain/repositories/beacon_repository.dart';
+import 'domain/repositories/map_repository.dart';
 import 'domain/use_cases/beacon_use_case.dart';
 import 'router/app_router.dart';
 
@@ -23,9 +25,12 @@ Future<void> main() async {
     beconRepository: beconRepository,
   );
 
+  final mapRepository = MapRepositoryImpl();
+
   runApp(
     MyApp(
       beconUseCase: beconUseCase,
+      mapRepository: mapRepository,
     ),
   );
 }
@@ -33,16 +38,22 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   MyApp({
     required BeconUseCase beconUseCase,
+    required MapRepository mapRepository,
     super.key,
-  }) : _beconUseCase = beconUseCase;
+  })  : _mapRepository = mapRepository,
+        _beconUseCase = beconUseCase;
 
   final BeconUseCase _beconUseCase;
+  final MapRepository _mapRepository;
   final _appRouter = AppRouter();
 
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
-      providers: [Provider.value(value: _beconUseCase)],
+      providers: [
+        Provider.value(value: _beconUseCase),
+        Provider.value(value: _mapRepository),
+      ],
       child: MaterialApp.router(
         title: 'UniWalker',
         theme: ThemeData(

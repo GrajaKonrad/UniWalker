@@ -1,5 +1,5 @@
-import 'package:uni_walker/domain/entities/entities.dart';
+import '../entities/entities.dart';
 
-interface class MapRepository {
-  List<MapLayer> getMap();
+abstract interface class MapRepository {
+  Future<List<MapLayer>> getMap();
 }

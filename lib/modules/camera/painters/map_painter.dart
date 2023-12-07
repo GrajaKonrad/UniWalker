@@ -11,20 +11,41 @@ class MapPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()..color = Colors.green;
+    final paint = Paint()
+      ..color = Colors.green
+      ..strokeWidth = 1;
 
-    for (final obstacle in layer.obstacle) {
-      final path = Path()
-        ..moveTo(obstacle.vertices.first.dx, obstacle.vertices.first.dy);
-
-      for (final vertex in obstacle.vertices) {
-        path.lineTo(vertex.dx, vertex.dy);
-      }
-
-      path.close();
-
-      canvas.drawPath(path, paint);
+    for (final obstacle in layer.obstacles) {
+      final x1 = _inverseLerp(
+        layer.boundries.left,
+        layer.boundries.right,
+        obstacle.a.dx,
+      );
+      final y1 = _inverseLerp(
+        layer.boundries.top,
+        layer.boundries.bottom,
+        obstacle.a.dy,
+      );
+      final x2 = _inverseLerp(
+        layer.boundries.left,
+        layer.boundries.right,
+        obstacle.b.dx,
+      );
+      final y2 = _inverseLerp(
+        layer.boundries.top,
+        layer.boundries.bottom,
+        obstacle.b.dy,
+      );
+      canvas.drawLine(
+        Offset(x1 * size.width, (1 - y1) * size.height),
+        Offset(x2 * size.width, (1 - y2) * size.height),
+        paint,
+      );
     }
+  }
+
+  double _inverseLerp(double a, double b, double v) {
+    return (v - a) / (b - a);
   }
 
   @override
