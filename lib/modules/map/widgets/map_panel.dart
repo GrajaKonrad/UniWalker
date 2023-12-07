@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:uni_walker/domain/entities/map_layer.dart';
-import 'package:uni_walker/domain/entities/obstacle.dart';
-import 'package:uni_walker/modules/camera/painters/map_painter.dart';
 
-class MapPanel extends StatefulWidget {
+import '../../../domain/entities/map_layer.dart';
+import '../../../domain/entities/obstacle.dart';
+import '../../camera/painters/map_painter.dart';
+
+class MapPanel extends StatelessWidget {
   const MapPanel({super.key});
 
   @override
+<<<<<<< Updated upstream
   State<MapPanel> createState() => _MapPanelState();
 }
 
@@ -15,6 +17,11 @@ class _MapPanelState extends State<MapPanel> {
   Widget build(BuildContext context) {
     return InteractiveViewer(
       child: Center(
+=======
+  Widget build(BuildContext context) {
+    return InteractiveViewer(
+      child: const Center(
+>>>>>>> Stashed changes
         child: CustomPaint(
           painter: MapPainter(
             layer: MapLayer(

@@ -13,11 +13,11 @@ class MapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final paint = Paint()..color = Colors.green;
 
-    for (var obstacle in layer.obstacle) {
+    for (final obstacle in layer.obstacle) {
       final path = Path()
         ..moveTo(obstacle.vertices.first.dx, obstacle.vertices.first.dy);
 
-      for (var vertex in obstacle.vertices) {
+      for (final vertex in obstacle.vertices) {
         path.lineTo(vertex.dx, vertex.dy);
       }
 

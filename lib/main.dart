@@ -1,31 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:uni_walker/data/repositories/beacon_repository_impl.dart';
-import 'package:uni_walker/data/repositories/beacon_repository_mock.dart';
-import 'package:uni_walker/domain/repositories/beacon_repository.dart';
-import 'package:uni_walker/domain/use_cases/beacon_use_case.dart';
-import 'package:uni_walker/router/app_router.dart';
+
+import 'data/repositories/beacon_repository_impl.dart';
+import 'domain/repositories/beacon_repository.dart';
+import 'domain/use_cases/beacon_use_case.dart';
+import 'router/app_router.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setPreferredOrientations([
+  await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
   ]);
 
-  BeconRepository beconRepository = BeconRepositoryImpl();
+  final BeconRepository beconRepository = BeconRepositoryImpl();
 
   await Future.wait([
     beconRepository.initi(),
   ]);
 
-  BeconUseCase beconUseCase = BeconUseCase(
+  final beconUseCase = BeconUseCase(
     beconRepository: beconRepository,
   );
 
-  runApp(MyApp(
-    beconUseCase: beconUseCase,
-  ));
+  runApp(
+    MyApp(
+      beconUseCase: beconUseCase,
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {

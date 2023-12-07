@@ -1,7 +1,8 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:uni_walker/modules/camera/painters/arrow_painter.dart';
+
+import '../painters/arrow_painter.dart';
 
 class Arrow extends StatefulWidget {
   const Arrow({super.key});
@@ -12,7 +13,7 @@ class Arrow extends StatefulWidget {
 
 class _ArrowState extends State<Arrow> with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation _animation;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -37,8 +38,9 @@ class _ArrowState extends State<Arrow> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Transform(
       alignment: Alignment.center,
-      transform: Matrix4.rotationX(.25 * pi) *
-          Matrix4.rotationZ(2 * pi * _animation.value),
+      transform: Matrix4.identity()
+        ..multiplied(Matrix4.rotationX(.25 * pi))
+        ..multiplied(Matrix4.rotationZ(2 * pi * _animation.value)),
       child: SizedBox(
         width: 92,
         height: 92,

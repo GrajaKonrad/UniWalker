@@ -3,8 +3,9 @@ import 'dart:async';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
-import 'package:uni_walker/domain/entities/entities.dart';
-import 'package:uni_walker/domain/use_cases/beacon_use_case.dart';
+
+import '../../../domain/entities/entities.dart';
+import '../../../domain/use_cases/beacon_use_case.dart';
 
 part 'device_list_state.dart';
 
@@ -18,15 +19,15 @@ class DeviceListCubit extends Cubit<DeviceListState> {
   StreamSubscription<List<Device>>? _subscription;
 
   Future<void> init() async {
-    _subscription?.cancel();
+    await _subscription?.cancel();
     _subscription = _beconUseCase.deviceStream.listen(_onData);
     await _beconUseCase.startScan();
   }
 
   @override
   Future<void> close() async {
-    _subscription?.cancel();
-    _beconUseCase.stopScan();
+    await _subscription?.cancel();
+    await _beconUseCase.stopScan();
     await super.close();
   }
 

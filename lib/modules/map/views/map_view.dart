@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_walker/modules/map/widgets/map_panel.dart';
+
+import '../widgets/map_panel.dart';
 
 @RoutePage()
 class MapView extends StatelessWidget {

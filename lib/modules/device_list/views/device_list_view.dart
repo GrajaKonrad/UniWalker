@@ -1,8 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:uni_walker/modules/device_list/cubit/device_list_cubit.dart';
-import 'package:uni_walker/modules/device_list/widgets/device_info_tile.dart';
+
+import '../cubit/device_list_cubit.dart';
+import '../widgets/device_info_tile.dart';
 
 @RoutePage()
 class DeviceListView extends StatelessWidget implements AutoRouteWrapper {
@@ -23,7 +24,7 @@ class DeviceListView extends StatelessWidget implements AutoRouteWrapper {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          title: const Text("Lista urządzeń"),
+          title: const Text('Lista urządzeń'),
           elevation: 0.5,
           shadowColor: Colors.black,
         ),
@@ -41,7 +42,7 @@ class DeviceListView extends StatelessWidget implements AutoRouteWrapper {
                       .toList(),
                 ),
               DeviceListErrorState _ => const Center(
-                  child: Text("Ups! Coś poszło nie tak!"),
+                  child: Text('Ups! Coś poszło nie tak!'),
                 ),
             };
           },

@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
-import 'package:uni_walker/domain/entities/device.dart';
-import 'package:uni_walker/domain/repositories/beacon_repository.dart';
+
+import '../../domain/entities/device.dart';
+import '../../domain/repositories/beacon_repository.dart';
 
 class BeconRepositoryMock implements BeconRepository {
   BeconRepositoryMock()

@@ -3,7 +3,8 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
-import 'package:uni_walker/modules/camera/widgets/arrow.dart';
+
+import '../widgets/arrow.dart';
 
 enum CameraViewMode {
   camera,

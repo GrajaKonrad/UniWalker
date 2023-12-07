@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:uni_walker/domain/entities/entities.dart';
+
+import '../../../domain/entities/entities.dart';
 
 class DeviceInfoTile extends StatelessWidget {
   const DeviceInfoTile({
@@ -24,7 +25,6 @@ class DeviceInfoTile extends StatelessWidget {
             child: Text(device.name),
           ),
           Expanded(
-            flex: 1,
             child: Text(device.rssi.toString()),
           ),
         ],
