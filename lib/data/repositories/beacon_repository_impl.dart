@@ -16,7 +16,6 @@ class BeaconRepositoryImpl implements BeconRepository {
 
   late final BehaviorSubject<List<Device>> _deviceStreamController;
   late final Map<dynamic, Map<dynamic, dynamic>> _knownBeacons;
-  late Map<String, List<int>> _closestRssiValues;
   StreamSubscription<List<ScanResult>>? _streamSubscription;
 
 
@@ -124,13 +123,59 @@ class BeaconRepositoryImpl implements BeconRepository {
       }
   }
 
-  num _calculateMetersFromRssi(double measuredRssi, int meterRssi, {int n = 3}) {
+  //Location calculation variables
+  late Map<String, List<int>> _closestRssiValues;
+  bool _flagIntersectDown = false;
+  bool _flagIntersectUp = false;
+
+
+  num _calculateMetersFromRssi(double measuredRssi, num meterRssi, {int n = 3}) {
     num power = (meterRssi - measuredRssi) / (10 * n);
     return pow(10, power);
   }
 
+  num _calculateRealDistance(String id, double mapScale, int n){
+    var mean = _closestRssiValues[id]!.reduce((a, b) => a + b) / _closestRssiValues[id]!.length;
+    var distanceMeters = _calculateMetersFromRssi(
+        mean,
+        _knownBeacons[id]?['RSSI_at_1m'] as num,
+        n: n);
+    distanceMeters *= mapScale;
+
+    return distanceMeters;
+  }
+
+  List<num> _calculateCircleIntersection(num x1, num y1, num r1, num x2, num y2, num r2){
+    double d = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+    //check id circles intersect with each other
+    if(d > r1 + r2) {
+      _flagIntersectUp = true;
+      return [0.0, 0.0, 0.0, 0.0];
+    }
+    if(d < (r1 - r2).abs()){
+      _flagIntersectDown = true;
+      return [0.0, 0.0, 0.0, 0.0];
+    }
+
+    //continue calculating intersection points
+    num l = (pow(r1, 2) - pow(r2, 2) + pow(d, 2)) / (2 * d);
+    double h = sqrt(pow(r1, 2) - pow(l, 2));
+    double xPart1 = (l / d) * (x2 - x1);
+    double xPart2 = (h / d) * (y2 - y1) + x1;
+    double yPart1 = (l / d) * (y2 - y1);
+    double yPart2 = (h / d) * (x2 - x1) + y1;
+
+    return [xPart1 + xPart2, yPart1 - yPart2, xPart1 - xPart2, yPart1 + yPart2];
+  }
+
+
   @override
-  (double, double, int) deviceLocation({double mapScale = 1}) {
+  (double, double, int) deviceLocation({double mapScale = 1, int defaultN = 3}) {
+    //returns
+    double userPosX = 0;
+    double userPosY = 0;
+    int userFloor = 0;
+
     List<Device> foundBeacons = _deviceStreamController.value;
     foundBeacons.sort((rssia, rssib) => rssia.rssi < rssib.rssi ? 1 : -1 );
 
@@ -145,17 +190,87 @@ class BeaconRepositoryImpl implements BeconRepository {
         _closestRssiValues[foundBeacons[i].id] = [foundBeacons[i].rssi];
       }
     }
-    print("sssssssssssssssssss ${foundBeacons.length}");
+
     //calculate device position
+    List<num> realDistance = [];
+    List<List<num>> intersectionPoints = [];
+    for(int i = 0; i<foundBeacons.length && i < 3 ; i++) {
+        num distanceMeters = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN);
+        realDistance.add(distanceMeters);
+    }
+    //calculate circle intersection
     if (foundBeacons.length >= 3){
-      for(int i = 0; i < 3; i++) {
-          var mean = _closestRssiValues[foundBeacons[i].id]!.reduce((a, b) => a + b) / _closestRssiValues[foundBeacons[i].id]!.length;
-          var distanceMeters = _calculateMetersFromRssi(mean, _knownBeacons[foundBeacons[i].id]?['RSSI_at_1m'] as int);
-          print(distanceMeters);
+      for(int i = 0; i < 3; i++){
+        _flagIntersectUp = false;
+        _flagIntersectDown = false;
+        int j = i + 1;
+        if (j == 3) j = 0;
+        num x1 = _knownBeacons[foundBeacons[i].id]?['Pos_x'] as num;
+        num x2 = _knownBeacons[foundBeacons[j].id]?['Pos_x'] as num;
+        num y1 = _knownBeacons[foundBeacons[i].id]?['Pos_y'] as num;
+        num y2 = _knownBeacons[foundBeacons[j].id]?['Pos_y'] as num;
+
+        print("Raw distance");
+        print(realDistance);
+
+        intersectionPoints.add(
+            _calculateCircleIntersection(x1, y1, realDistance[i], x2, y2, realDistance[j]));
+        int addToN = -1;
+        while (_flagIntersectUp && defaultN  + addToN > 0){
+          print("Step-up distance");
+          _flagIntersectUp = false;
+          num newDistance1 = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN + addToN);
+          num newDistance2 = _calculateRealDistance(foundBeacons[j].id, mapScale, defaultN + addToN);
+          print("Distance 1: $newDistance1 Distance 2: $newDistance2");
+          intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
+          addToN--;
         }
+        addToN = 1;
+        while (_flagIntersectDown && defaultN  + addToN < 5){
+          print("Step-down distance");
+          _flagIntersectDown = false;
+          num newDistance1 = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN + addToN);
+          num newDistance2 = _calculateRealDistance(foundBeacons[j].id, mapScale, defaultN + addToN);
+          print("Distance 1: $newDistance1 Distance 2: $newDistance2");
+          intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
+          addToN--;
+        }
+        if(_flagIntersectUp || _flagIntersectDown){
+          print("flags");
+        }
+      }
+      print(intersectionPoints);
+      //calculate position
+      List<List<double>> middlePoints = [[0, 0], [0, 0], [0, 0]];
+      for(int i = 0; i < 3; i++){
+        double minDistance = 1000000;
+
+        int j = i - 1;
+        if( j < 0) j = 2;
+
+        for(int x = 0; x < 2; x++){
+          for(int y = 0; y < 2; y++){
+              double distance = sqrt(pow(intersectionPoints[i][x * 2] - intersectionPoints[j][y * 2], 2)
+                  + pow(intersectionPoints[i][x * 2 + 1] - intersectionPoints[j][y * 2 + 1], 2));
+              if(minDistance > distance){
+                minDistance = distance;
+                middlePoints[i][0] = (intersectionPoints[i][x * 2] + intersectionPoints[j][y * 2]) / 2;
+                middlePoints[i][1] = (intersectionPoints[i][x * 2 + 1] + intersectionPoints[j][y * 2 + 1]) / 2;
+              }
+          }
+        }
+      }
+      // calculate middle of the triangle - user position
+      for(List <double> point in middlePoints){
+        userPosX += point[0];
+        userPosY += point[1];
+      }
+      userPosX /= 3;
+      userPosY /= 3;
     }
 
+    print("User position coordinates \nX: $userPosX \nY: $userPosY \n Floor: $userFloor");
     //X value, Y value, Floor number (from 0)
-    return (0, 0 ,0);
+    return (userPosX, userPosY ,userFloor);
   }
 }
