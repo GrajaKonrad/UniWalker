@@ -2,6 +2,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
 import '../../../router/app_router.dart';
+import '../widgets/button.dart';
 
 @RoutePage()
 class HomeView extends StatelessWidget {
@@ -16,29 +17,55 @@ class HomeView extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'UniWalker',
-                style: TextStyle(
-                  color: Colors.orangeAccent,
-                  fontSize: 40,
-                  fontWeight: FontWeight.w600,
-                  height: 1.25,
-                ),
+              Stack(
+                children: [
+                  SizedBox(
+                    child: Icon(
+                      Icons.map_outlined,
+                      size: 196,
+                      color: Colors.deepOrangeAccent.shade100,
+                    ),
+                  ),
+                  const Positioned(
+                    top: 75,
+                    child: Text(
+                      'UniWalker',
+                      style: TextStyle(
+                        color: Colors.deepPurpleAccent,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                      ),
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 64),
-              TextButton(
-                onPressed: () => context.navigateTo(const CameraRoute()),
-                child: const Text('Kamera'),
+              HomeButton(
+                text: 'AR',
+                icon: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: Colors.white,
+                ),
+                onTap: () => context.navigateTo(const CameraRoute()),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => context.navigateTo(const DeviceListRoute()),
-                child: const Text('Bluetooth'),
+              const SizedBox(height: 16),
+              HomeButton(
+                text: 'Bluetooth',
+                icon: const Icon(
+                  Icons.bluetooth,
+                  color: Colors.white,
+                ),
+                onTap: () => context.navigateTo(const DeviceListRoute()),
               ),
-              const SizedBox(height: 8),
-              TextButton(
-                onPressed: () => context.navigateTo(const MapRoute()),
-                child: const Text('Mapa'),
+              const SizedBox(height: 16),
+              HomeButton(
+                text: 'Mapa',
+                icon: const Icon(
+                  Icons.map_outlined,
+                  color: Colors.white,
+                ),
+                onTap: () => context.navigateTo(const MapRoute()),
               ),
             ],
           ),

@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/custom_app_bar.dart';
 import '../widgets/map_panel.dart';
 
 @RoutePage()
@@ -11,8 +12,8 @@ class MapView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(0xffe5e5e5),
+        appBar: CustomAppBar(
+          title: const Text('Mapa'),
         ),
         body: const MapPanel(),
       ),

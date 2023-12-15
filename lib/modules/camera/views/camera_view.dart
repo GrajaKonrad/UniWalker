@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 
+import '../../widgets/custom_app_bar.dart';
 import '../widgets/arrow.dart';
 
 enum CameraViewMode {
@@ -39,15 +40,13 @@ class _CameraViewState extends State<CameraView> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        appBar: AppBar(
+        appBar: CustomAppBar(
           title: const TextField(
             decoration: InputDecoration(
               hintText: 'Znajdź salę',
               suffixIcon: Icon(Icons.search),
             ),
           ),
-          elevation: 0.5,
-          shadowColor: Colors.black,
         ),
         backgroundColor: Colors.black,
         body: Stack(
