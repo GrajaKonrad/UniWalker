@@ -203,6 +203,9 @@ class BeaconRepositoryImpl implements BeconRepository {
     // double yPart2 = (h / d) * (x2 - x1) + y1;
     //
     // return [xPart1 + xPart2, yPart1 + yPart2, xPart1 - xPart2, yPart1 - yPart2];
+    if(xIntersection1.isNaN || d == r1 + r2){
+      print("NaN");
+    }
 
     return [xIntersection1, yIntersection1, xIntersection2, yIntersection2];
   }
@@ -277,7 +280,7 @@ class BeaconRepositoryImpl implements BeconRepository {
           var name2=foundBeacons[j].id;
           print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
           intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
-          addToN--;
+          addToN++;
         }
         if(_flagIntersectUp || _flagIntersectDown){
           print("flags");
