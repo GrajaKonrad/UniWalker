@@ -127,6 +127,7 @@ class BeaconRepositoryImpl implements BeconRepository {
   late Map<String, List<int>> _closestRssiValues;
   bool _flagIntersectDown = false;
   bool _flagIntersectUp = false;
+  late int _defaultN;
 
 
   num _calculateMetersFromRssi(double measuredRssi, num meterRssi, {int n = 3}) {
@@ -136,10 +137,18 @@ class BeaconRepositoryImpl implements BeconRepository {
 
   num _calculateRealDistance(String id, double mapScale, int n){
     var mean = _closestRssiValues[id]!.reduce((a, b) => a + b) / _closestRssiValues[id]!.length;
-    var distanceMeters = _calculateMetersFromRssi(
-        mean,
-        _knownBeacons[id]?['RSSI_at_1m'] as num,
-        n: n);
+    num distanceMeters = 0.0;
+    if (mean <= _knownBeacons[id]?['RSSI_at_1m']){
+        distanceMeters = _calculateMetersFromRssi(
+          mean,
+          _knownBeacons[id]?['RSSI_at_1m'] as num,
+          n: n);
+    } else{
+        distanceMeters = _calculateMetersFromRssi(
+          mean,
+          _knownBeacons[id]?['RSSI_at_1m'] as num,
+          n: _defaultN + (_defaultN - n));
+    }
     distanceMeters *= mapScale;
 
     return distanceMeters;
@@ -157,21 +166,52 @@ class BeaconRepositoryImpl implements BeconRepository {
       return [0.0, 0.0, 0.0, 0.0];
     }
 
-    //continue calculating intersection points
-    num l = (pow(r1, 2) - pow(r2, 2) + pow(d, 2)) / (2 * d);
-    double h = sqrt(pow(r1, 2) - pow(l, 2));
-    double xPart1 = (l / d) * (x2 - x1);
-    double xPart2 = (h / d) * (y2 - y1) + x1;
-    double yPart1 = (l / d) * (y2 - y1);
-    double yPart2 = (h / d) * (x2 - x1) + y1;
+    // Area according to Heron's formula
+    double a1 = d + r1 + r2;
+    double a2 = d + r1 - r2;
+    double a3 = d - r1 + r2;
+    double a4 = -d + r1 + r2;
 
-    return [xPart1 + xPart2, yPart1 - yPart2, xPart1 - xPart2, yPart1 + yPart2];
+    double area = sqrt(a1 * a2 * a3 * a4) / 4;
+
+    // Calculating x axis intersection values
+    double xP1 = (x1 + x2) / 2 + (x2 - x1) * (pow(r1, 2) - pow(r2, 2)) / (2 * pow(d, 2));
+    double xP2 = 2 * (y1 - y2) * area / pow(d, 2);
+
+    double xIntersection1 = xP1 + xP2;
+    double xIntersection2 = xP1 - xP2;
+
+    // Calculating y axis intersection values
+    double yP1 = (y1 + y2) / 2 + (y2 - y1) * (pow(r1, 2) - pow(r2, 2)) / (2 * pow(d, 2));
+    double yP2 = 2 * (x1 - x2) * area / pow(d, 2);
+
+    double yIntersection1 = yP1 - yP2;
+    double yIntersection2 = yP1 + yP2;
+
+    double test = ((xIntersection1 - x1) * (xIntersection1 - x1) + (yIntersection1 - y1) * (yIntersection1 - y1) - pow(r1, 2)).abs();
+    if(test > 0.0000001){
+      double tmp = yIntersection1;
+      yIntersection1 = yIntersection2;
+      yIntersection2 = tmp;
+    }
+    // //continue calculating intersection points
+    // num l = (pow(r1, 2) - pow(r2, 2) + pow(d, 2)) / (2 * d);
+    // double h = sqrt(pow(r1, 2) - pow(l, 2));
+    // double xPart1 = (l / d) * (x2 - x1);
+    // double xPart2 = (h / d) * (y2 - y1) + x1;
+    // double yPart1 = (l / d) * (y2 - y1);
+    // double yPart2 = (h / d) * (x2 - x1) + y1;
+    //
+    // return [xPart1 + xPart2, yPart1 + yPart2, xPart1 - xPart2, yPart1 - yPart2];
+
+    return [xIntersection1, yIntersection1, xIntersection2, yIntersection2];
   }
 
 
   @override
   (double, double, int) deviceLocation({double mapScale = 1, int defaultN = 3}) {
     //returns
+    _defaultN = defaultN;
     double userPosX = 0;
     double userPosY = 0;
     int userFloor = 0;
@@ -221,7 +261,9 @@ class BeaconRepositoryImpl implements BeconRepository {
           _flagIntersectUp = false;
           num newDistance1 = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN + addToN);
           num newDistance2 = _calculateRealDistance(foundBeacons[j].id, mapScale, defaultN + addToN);
-          print("Distance 1: $newDistance1 Distance 2: $newDistance2");
+          var name1=foundBeacons[i].id;
+          var name2=foundBeacons[j].id;
+          print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
           intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
           addToN--;
         }
@@ -231,7 +273,9 @@ class BeaconRepositoryImpl implements BeconRepository {
           _flagIntersectDown = false;
           num newDistance1 = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN + addToN);
           num newDistance2 = _calculateRealDistance(foundBeacons[j].id, mapScale, defaultN + addToN);
-          print("Distance 1: $newDistance1 Distance 2: $newDistance2");
+          var name1=foundBeacons[i].id;
+          var name2=foundBeacons[j].id;
+          print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
           intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
           addToN--;
         }
