@@ -1,46 +1,33 @@
 import 'package:flutter/services.dart';
 
-import 'obstacle.dart';
+import 'map_element.dart';
 
 class MapLayer {
   MapLayer({
-    required this.obstacles,
+    required this.walls,
   }) {
-    var minX = double.infinity;
-    var minY = double.infinity;
-    var maxX = double.negativeInfinity;
-    var maxY = double.negativeInfinity;
+    var minX = double.maxFinite;
+    var minY = double.maxFinite;
+    var maxX = -double.maxFinite;
+    var maxY = -double.maxFinite;
 
-    for (final obstacle in obstacles) {
-      if (obstacle.a.dx < minX) {
-        minX = obstacle.a.dx;
+    for (final wall in walls) {
+      if (wall.constraints.left < minX) {
+        minX = wall.constraints.left;
       }
-      if (obstacle.a.dx > maxX) {
-        maxX = obstacle.a.dx;
+      if (wall.constraints.right > maxX) {
+        maxX = wall.constraints.right;
       }
-      if (obstacle.a.dy < minY) {
-        minY = obstacle.a.dy;
+      if (wall.constraints.top < minY) {
+        minY = wall.constraints.top;
       }
-      if (obstacle.a.dy > maxY) {
-        maxY = obstacle.a.dy;
-      }
-
-      if (obstacle.b.dx < minX) {
-        minX = obstacle.b.dx;
-      }
-      if (obstacle.b.dx > maxX) {
-        maxX = obstacle.b.dx;
-      }
-      if (obstacle.b.dy < minY) {
-        minY = obstacle.b.dy;
-      }
-      if (obstacle.b.dy > maxY) {
-        maxY = obstacle.b.dy;
+      if (wall.constraints.bottom > maxY) {
+        maxY = wall.constraints.bottom;
       }
     }
-    boundries = Rect.fromLTRB(minX, minY, maxX, maxY);
+    constraints = Rect.fromLTRB(minX, minY, maxX, maxY);
   }
 
-  final List<Obstacle> obstacles;
-  late final Rect boundries;
+  final List<MapElemnent> walls;
+  late final Rect constraints;
 }

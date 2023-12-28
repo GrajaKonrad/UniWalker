@@ -20,7 +20,7 @@ class MapPanel extends StatelessWidget {
               child: Center(
                 child: LayoutBuilder(
                   builder: (context, constraints) {
-                    final boundries = snapshot.data!.first.boundries;
+                    final boundries = snapshot.data!.first.constraints;
                     final aspectRatio = (boundries.bottom - boundries.top) /
                         (boundries.right - boundries.left);
 

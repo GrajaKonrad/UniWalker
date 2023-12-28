@@ -26,6 +26,6 @@ class MapRepositoryImpl implements MapRepository {
         ),
       );
     }
-    return [MapLayer(obstacles: walls)];
+    return [MapLayer(walls: walls)];
   }
 }

@@ -8,6 +8,7 @@ import 'domain/repositories/beacon_repository.dart';
 import 'domain/repositories/map_repository.dart';
 import 'domain/use_cases/beacon_use_case.dart';
 import 'router/app_router.dart';
+import 'ui/colors.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -57,7 +58,10 @@ class MyApp extends StatelessWidget {
       child: MaterialApp.router(
         title: 'UniWalker',
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(
+            seedColor: AppColors.primary800,
+            background: AppColors.grayscale600,
+          ),
           useMaterial3: true,
         ),
         routerConfig: _appRouter.config(),

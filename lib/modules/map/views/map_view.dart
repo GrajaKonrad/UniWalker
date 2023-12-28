@@ -13,7 +13,7 @@ class MapView extends StatelessWidget {
     return SafeArea(
       child: Scaffold(
         appBar: CustomAppBar(
-          title: const Text('Mapa'),
+          title: const Text('Znajdź salę'),
         ),
         body: const MapPanel(),
       ),

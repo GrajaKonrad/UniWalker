@@ -1,9 +1,9 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 
 import '../../../router/app_router.dart';
-import '../widgets/button.dart';
+import '../../../ui/colors.dart';
+import '../widgets/home_button.dart';
 
 @RoutePage()
 class HomeView extends StatelessWidget {
@@ -11,10 +11,62 @@ class HomeView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: UnityWidget(
-          onUnityCreated: (_) => {},
+    return SafeArea(
+      child: Scaffold(
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(
+                Icons.directions_walk_outlined,
+                size: 96,
+                color: AppColors.primary600,
+              ),
+              RichText(
+                text: const TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'Uni',
+                      style: TextStyle(
+                        color: AppColors.primary600,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'Walker',
+                      style: TextStyle(
+                        color: AppColors.secondary600,
+                        fontSize: 40,
+                        fontWeight: FontWeight.w600,
+                        height: 1.25,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              HomeButton(
+                text: 'Znajdź salę',
+                icon: const Icon(
+                  Icons.map_outlined,
+                  color: AppColors.secondary600,
+                ),
+                onTap: () => context.navigateTo(const MapRoute()),
+              ),
+              const SizedBox(height: 16),
+              HomeButton(
+                text: 'AR',
+                icon: const Icon(
+                  Icons.camera_alt_outlined,
+                  color: AppColors.secondary600,
+                ),
+                onTap: () => context.navigateTo(const CameraRoute()),
+              ),
+            ],
+          ),
         ),
       ),
     );

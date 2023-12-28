@@ -15,25 +15,25 @@ class MapPainter extends CustomPainter {
       ..color = Colors.green
       ..strokeWidth = 1;
 
-    for (final obstacle in layer.obstacles) {
+    for (final obstacle in layer.walls) {
       final x1 = _inverseLerp(
-        layer.boundries.left,
-        layer.boundries.right,
+        layer.constraints.left,
+        layer.constraints.right,
         obstacle.a.dx,
       );
       final y1 = _inverseLerp(
-        layer.boundries.top,
-        layer.boundries.bottom,
+        layer.constraints.top,
+        layer.constraints.bottom,
         obstacle.a.dy,
       );
       final x2 = _inverseLerp(
-        layer.boundries.left,
-        layer.boundries.right,
+        layer.constraints.left,
+        layer.constraints.right,
         obstacle.b.dx,
       );
       final y2 = _inverseLerp(
-        layer.boundries.top,
-        layer.boundries.bottom,
+        layer.constraints.top,
+        layer.constraints.bottom,
         obstacle.b.dy,
       );
       canvas.drawLine(
