@@ -106,21 +106,17 @@ class BeaconRepositoryImpl implements BeconRepository {
   }
 
   void _deviceCallback(List<ScanResult> results) {
-      for (var propagator in results) {
-        if(_knownBeacons.containsKey(propagator.device.remoteId.str)){
-          _deviceStreamController.add(
-            results
-              .map(
-                (e) => Device(
-                  id: e.device.remoteId.str,
-                  name: e.advertisementData.localName,
-                  rssi: e.rssi,
-                ),
-              )
-              .toList(),
-          );
-        }
-      }
+    _deviceStreamController.add(
+        results.where(
+          (e) => _knownBeacons.containsKey(e.device.remoteId.str)
+        ).map(
+          (e) => Device(
+            id: e.device.remoteId.str,
+            name: e.advertisementData.localName,
+            rssi: e.rssi,
+          )
+        ).toList()
+    );
   }
 
   //Location calculation variables
@@ -171,7 +167,9 @@ class BeaconRepositoryImpl implements BeconRepository {
     double a2 = d + r1 - r2;
     double a3 = d - r1 + r2;
     double a4 = -d + r1 + r2;
-
+    if(0 > a2){a2 = 0;}
+    if(0 > a3){a3 = 0;}
+    if(0 > a4){a4 = 0;}
     double area = sqrt(a1 * a2 * a3 * a4) / 4;
 
     // Calculating x axis intersection values
@@ -194,22 +192,8 @@ class BeaconRepositoryImpl implements BeconRepository {
       yIntersection1 = yIntersection2;
       yIntersection2 = tmp;
     }
-    // //continue calculating intersection points
-    // num l = (pow(r1, 2) - pow(r2, 2) + pow(d, 2)) / (2 * d);
-    // double h = sqrt(pow(r1, 2) - pow(l, 2));
-    // double xPart1 = (l / d) * (x2 - x1);
-    // double xPart2 = (h / d) * (y2 - y1) + x1;
-    // double yPart1 = (l / d) * (y2 - y1);
-    // double yPart2 = (h / d) * (x2 - x1) + y1;
-    //
-    // return [xPart1 + xPart2, yPart1 + yPart2, xPart1 - xPart2, yPart1 - yPart2];
-    if(xIntersection1.isNaN || d == r1 + r2){
-      print("NaN");
-    }
-
     return [xIntersection1, yIntersection1, xIntersection2, yIntersection2];
   }
-
 
   @override
   (double, double, int) deviceLocation({double mapScale = 1, int defaultN = 3}) {
@@ -253,40 +237,68 @@ class BeaconRepositoryImpl implements BeconRepository {
         num y1 = _knownBeacons[foundBeacons[i].id]?['Pos_y'] as num;
         num y2 = _knownBeacons[foundBeacons[j].id]?['Pos_y'] as num;
 
-        print("Raw distance");
-        print(realDistance);
+        // print("Raw distance");
+        // print(realDistance);
 
         intersectionPoints.add(
             _calculateCircleIntersection(x1, y1, realDistance[i], x2, y2, realDistance[j]));
+        // if circles radius is too small both are sized up in the same proportion to previous size
         int addToN = -1;
         while (_flagIntersectUp && defaultN  + addToN > 0){
-          print("Step-up distance");
+          //print("Step-up distance");
           _flagIntersectUp = false;
           num newDistance1 = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN + addToN);
           num newDistance2 = _calculateRealDistance(foundBeacons[j].id, mapScale, defaultN + addToN);
-          var name1=foundBeacons[i].id;
-          var name2=foundBeacons[j].id;
-          print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
+          // var name1=foundBeacons[i].id;
+          // var name2=foundBeacons[j].id;
+          //print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
           intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
           addToN--;
         }
+        // if circles radius is too big both are sized down in the same proportion to previous size
         addToN = 1;
         while (_flagIntersectDown && defaultN  + addToN < 5){
-          print("Step-down distance");
+          //print("Step-down distance");
           _flagIntersectDown = false;
           num newDistance1 = _calculateRealDistance(foundBeacons[i].id, mapScale, defaultN + addToN);
           num newDistance2 = _calculateRealDistance(foundBeacons[j].id, mapScale, defaultN + addToN);
-          var name1=foundBeacons[i].id;
-          var name2=foundBeacons[j].id;
-          print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
+          // var name1=foundBeacons[i].id;
+          // var name2=foundBeacons[j].id;
+          //print("Distance $name1: $newDistance1 Distance $name2: $newDistance2");
           intersectionPoints[i] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
           addToN++;
         }
-        if(_flagIntersectUp || _flagIntersectDown){
-          print("flags");
+
+        // if above fails we get points that are closest to the middle of both circles and take point between as an intersection
+        if(_flagIntersectUp){
+          _flagIntersectUp = false;
+          double d = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+          List <num> closesPointCircle1 = _calculateCircleIntersection(x1, y1, realDistance[i], x2, y2, d - realDistance[i]);
+          List <num> closesPointCircle2 = _calculateCircleIntersection(x1, y1, d - realDistance[j], x2, y2, realDistance[j]);
+          List <num> middlePoint = [(closesPointCircle1[0] + closesPointCircle2[0]) / 2, (closesPointCircle1[1] + closesPointCircle2[1]) / 2];
+          intersectionPoints[i] = middlePoint + middlePoint;
         }
+        if(_flagIntersectDown)
+          {
+            _flagIntersectDown = false;
+            double d = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+              if(realDistance[i] > realDistance[j])
+                {
+                  List <num> closesPointCircle1 = _calculateCircleIntersection(x1, y1, d + realDistance[j], x2, y2,realDistance[j]);
+                  List <num> closesPointCircle2 = _calculateCircleIntersection(x1, y1, realDistance[i], x2, y2,realDistance[i] - d);
+                  List <num> middlePoint = [(closesPointCircle1[0] + closesPointCircle2[0]) / 2, (closesPointCircle1[1] + closesPointCircle2[1]) / 2];
+                  intersectionPoints[i] = middlePoint + middlePoint;
+                }
+              else
+                {
+                  List <num> closesPointCircle1 = _calculateCircleIntersection(x1, y1, realDistance[i], x2, y2, d + realDistance[i]);
+                  List <num> closesPointCircle2 = _calculateCircleIntersection(x1, y1, realDistance[j] - d, x2, y2,realDistance[j]);
+                  List <num> middlePoint = [(closesPointCircle1[0] + closesPointCircle2[0]) / 2, (closesPointCircle1[1] + closesPointCircle2[1]) / 2];
+                  intersectionPoints[i] = middlePoint + middlePoint;
+                }
+          }
       }
-      print(intersectionPoints);
+      //print(intersectionPoints);
       //calculate position
       List<List<double>> middlePoints = [[0, 0], [0, 0], [0, 0]];
       for(int i = 0; i < 3; i++){
@@ -316,8 +328,11 @@ class BeaconRepositoryImpl implements BeconRepository {
       userPosY /= 3;
     }
 
-    print("User position coordinates \nX: $userPosX \nY: $userPosY \n Floor: $userFloor");
+    //print("User position coordinates \nX: $userPosX \nY: $userPosY \n Floor: $userFloor");
     //X value, Y value, Floor number (from 0)
     return (userPosX, userPosY ,userFloor);
   }
 }
+
+
+//TODO: remove all prints - in comments too
