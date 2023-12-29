@@ -124,6 +124,7 @@ class BeaconRepositoryImpl implements BeconRepository {
   bool _flagIntersectDown = false;
   bool _flagIntersectUp = false;
   late int _defaultN;
+  List<double> lastKnownPosition = [0, 0];
 
 
   num _calculateMetersFromRssi(double measuredRssi, num meterRssi, {int n = 3}) {
@@ -131,7 +132,7 @@ class BeaconRepositoryImpl implements BeconRepository {
     return pow(10, power);
   }
 
-  num _calculateRealDistance(String id, double mapScale, int n){
+  num _calculateRealDistance(String id, double mapScale, int n, {double defaultUserPhoneZ = 1.4}){
     var mean = _closestRssiValues[id]!.reduce((a, b) => a + b) / _closestRssiValues[id]!.length;
     num distanceMeters = 0.0;
     if (mean <= _knownBeacons[id]?['RSSI_at_1m']){
@@ -144,6 +145,11 @@ class BeaconRepositoryImpl implements BeconRepository {
           mean,
           _knownBeacons[id]?['RSSI_at_1m'] as num,
           n: _defaultN + (_defaultN - n));
+    }
+    //adjusting for beacon height in relation to user phone
+    double heightDifference = _knownBeacons[id]?['Pos_z'] - defaultUserPhoneZ;
+    if(distanceMeters > heightDifference.abs()) {
+      distanceMeters = sqrt(pow(distanceMeters, 2) - pow(heightDifference, 2));
     }
     distanceMeters *= mapScale;
 
@@ -161,12 +167,12 @@ class BeaconRepositoryImpl implements BeconRepository {
       _flagIntersectDown = true;
       return [0.0, 0.0, 0.0, 0.0];
     }
-
     // Area according to Heron's formula
     double a1 = d + r1 + r2;
     double a2 = d + r1 - r2;
     double a3 = d - r1 + r2;
     double a4 = -d + r1 + r2;
+    // C
     if(0 > a2){a2 = 0;}
     if(0 > a3){a3 = 0;}
     if(0 > a4){a4 = 0;}
@@ -297,7 +303,12 @@ class BeaconRepositoryImpl implements BeconRepository {
                   intersectionPoints[i] = middlePoint + middlePoint;
                 }
           }
+
+        // calculate user floor
+        userFloor += _knownBeacons[foundBeacons[i].id]!['Device_floor'] as int;
       }
+      userFloor = (userFloor / 3).round();
+
       //print(intersectionPoints);
       //calculate position
       List<List<double>> middlePoints = [[0, 0], [0, 0], [0, 0]];
@@ -327,7 +338,80 @@ class BeaconRepositoryImpl implements BeconRepository {
       userPosX /= 3;
       userPosY /= 3;
     }
+    else if(foundBeacons.length == 2){
+      //only two beacons found - Use last known position
+      _flagIntersectUp = false;
+      _flagIntersectDown = false;
+      num x1 = _knownBeacons[foundBeacons[0].id]?['Pos_x'] as num;
+      num x2 = _knownBeacons[foundBeacons[1].id]?['Pos_x'] as num;
+      num y1 = _knownBeacons[foundBeacons[0].id]?['Pos_y'] as num;
+      num y2 = _knownBeacons[foundBeacons[1].id]?['Pos_y'] as num;
 
+      intersectionPoints.add(
+          _calculateCircleIntersection(x1, y1, realDistance[0], x2, y2, realDistance[1]));
+
+      int addToN = -1;
+      while (_flagIntersectUp && defaultN  + addToN > 0){
+        //print("Step-up distance");
+        _flagIntersectUp = false;
+        num newDistance1 = _calculateRealDistance(foundBeacons[0].id, mapScale, defaultN + addToN);
+        num newDistance2 = _calculateRealDistance(foundBeacons[1].id, mapScale, defaultN + addToN);
+        intersectionPoints[0] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
+        addToN--;
+      }
+      // if circles radius is too big both are sized down in the same proportion to previous size
+      addToN = 1;
+      while (_flagIntersectDown && defaultN  + addToN < 5){
+        //print("Step-down distance");
+        _flagIntersectDown = false;
+        num newDistance1 = _calculateRealDistance(foundBeacons[0].id, mapScale, defaultN + addToN);
+        num newDistance2 = _calculateRealDistance(foundBeacons[1].id, mapScale, defaultN + addToN);
+        intersectionPoints[0] = _calculateCircleIntersection(x1, y1, newDistance1, x2, y2, newDistance2);
+        addToN++;
+      }
+      // if above fails we get points that are closest to the middle of both circles and take point between as an intersection
+      if(_flagIntersectUp){
+        _flagIntersectUp = false;
+        double d = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+        List <num> closesPointCircle1 = _calculateCircleIntersection(x1, y1, realDistance[0], x2, y2, d - realDistance[0]);
+        List <num> closesPointCircle2 = _calculateCircleIntersection(x1, y1, d - realDistance[1], x2, y2, realDistance[1]);
+        List <num> middlePoint = [(closesPointCircle1[0] + closesPointCircle2[0]) / 2, (closesPointCircle1[1] + closesPointCircle2[1]) / 2];
+        intersectionPoints[0] = middlePoint + middlePoint;
+      }
+      if(_flagIntersectDown)
+      {
+        _flagIntersectDown = false;
+        double d = sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+        if(realDistance[0] > realDistance[1])
+        {
+          List <num> closesPointCircle1 = _calculateCircleIntersection(x1, y1, d + realDistance[1], x2, y2,realDistance[1]);
+          List <num> closesPointCircle2 = _calculateCircleIntersection(x1, y1, realDistance[0], x2, y2,realDistance[0] - d);
+          List <num> middlePoint = [(closesPointCircle1[0] + closesPointCircle2[0]) / 2, (closesPointCircle1[1] + closesPointCircle2[1]) / 2];
+          intersectionPoints[0] = middlePoint + middlePoint;
+        }
+        else
+        {
+          List <num> closesPointCircle1 = _calculateCircleIntersection(x1, y1, realDistance[0], x2, y2, d + realDistance[0]);
+          List <num> closesPointCircle2 = _calculateCircleIntersection(x1, y1, realDistance[1] - d, x2, y2,realDistance[1]);
+          List <num> middlePoint = [(closesPointCircle1[0] + closesPointCircle2[0]) / 2, (closesPointCircle1[1] + closesPointCircle2[1]) / 2];
+          intersectionPoints[0] = middlePoint + middlePoint;
+        }
+      }
+
+      //calculate which intersection point is closest to last known position
+      double distance = sqrt(pow(intersectionPoints[0][0] - lastKnownPosition[0], 2) + pow(intersectionPoints[0][1] - lastKnownPosition[1], 2));
+      double newDistance = sqrt(pow(intersectionPoints[0][3] - lastKnownPosition[0], 2) + pow(intersectionPoints[0][4] - lastKnownPosition[1], 2));
+      if (distance <= newDistance ){
+        userPosX = intersectionPoints[0][1].toDouble();
+        userPosY = intersectionPoints[0][2].toDouble();
+      } else{
+        userPosX = intersectionPoints[0][3].toDouble();
+        userPosY = intersectionPoints[0][4].toDouble();
+      }
+      userFloor = _knownBeacons[foundBeacons[0].id]?['Device_floor'] as int;
+    }
+
+    lastKnownPosition = [userPosX, userPosY];
     //print("User position coordinates \nX: $userPosX \nY: $userPosY \n Floor: $userFloor");
     //X value, Y value, Floor number (from 0)
     return (userPosX, userPosY ,userFloor);
