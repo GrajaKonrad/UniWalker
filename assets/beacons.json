@@ -1,0 +1,29 @@
+[
+  {
+    "Device_id": "DC:2C:6E:15:61:D8",
+    "Name": "Anchor0",
+    "RSSI_at_1m": -56,
+    "Pos_x": 2,
+    "Pos_y": 2.5,
+    "Pos_z": 1.4,
+    "Device_floor": 0
+  },
+  {
+    "Device_id": "DC:2C:6E:18:68:6D",
+    "Name": "Anchor1",
+    "RSSI_at_1m": -58,
+    "Pos_x": 3.2,
+    "Pos_y": 0,
+    "Pos_z": 1.3,
+    "Device_floor": 0
+  },
+  {
+    "Device_id": "DC:2C:6E:18:68:31",
+    "Name": "Anchor2",
+    "RSSI_at_1m": -56,
+    "Pos_x": 0,
+    "Pos_y": 0,
+    "Pos_z": 1.5,
+    "Device_floor": 0
+  }
+]
