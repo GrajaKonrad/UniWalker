@@ -1,11 +1,27 @@
-import 'dart:ui';
+import 'dart:math';
 
-sealed class MapElemnent {
-  const MapElemnent();
+import 'package:flutter/material.dart';
 
-  static MapElemnent fromJson(Map<String, dynamic> json) {}
+part 'arc.dart';
+part 'line.dart';
 
-  Rect get constraints;
+sealed class MapElement {
+  const MapElement();
 
-  void draw(Canvas canvas, Rect canvasConstraints);
+  static MapElement fromJson(Map<String, dynamic> json) {
+    return switch (json['type']) {
+      'line' => Line.fromJson(json),
+      'arc' => Arc.fromJson(json),
+      _ => throw Exception(),
+    };
+  }
+
+  Path add({
+    required Path path,
+  });
+
+  Path addWithPadding({
+    required Path path,
+    required double padding,
+  });
 }

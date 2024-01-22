@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:auto_route/auto_route.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+// import 'package:flutter_unity_widget/flutter_unity_widget.dart';
 
 import '../../widgets/custom_app_bar.dart';
 import '../widgets/arrow.dart';
@@ -37,6 +38,24 @@ class _CameraViewState extends State<CameraView> {
   }
 
   @override
+  // Widget build(BuildContext context) {
+  //   return SafeArea(
+  //     child: Scaffold(
+  //       appBar: CustomAppBar(
+  //         title: const TextField(
+  //           decoration: InputDecoration(
+  //             hintText: 'Znajdź salę',
+  //             suffixIcon: Icon(Icons.search),
+  //           ),
+  //         ),
+  //       ),
+  //       body: UnityWidget(
+  //         onUnityCreated: (controller) => {},
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(

@@ -3,58 +3,52 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/repositories/map_repository.dart';
 import '../../../logger.dart';
-import '../../camera/painters/map_painter.dart';
+import 'map_widget.dart';
 
 class MapPanel extends StatelessWidget {
   const MapPanel({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-      future: context.read<MapRepository>().getMap(),
-      builder: (context, snapshot) {
-        if (snapshot.hasData) {
-          return InteractiveViewer(
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Center(
-                child: LayoutBuilder(
+    return Column(
+      children: [
+        const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: TextField(
+            decoration: InputDecoration(labelText: 'Znajdź salę'),
+          ),
+        ),
+        Expanded(
+          child: FutureBuilder(
+            future: context.read<MapRepository>().getMap(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                Logger.success('done');
+                return LayoutBuilder(
                   builder: (context, constraints) {
-                    final boundries = snapshot.data!.first.constraints;
-                    final aspectRatio = (boundries.bottom - boundries.top) /
-                        (boundries.right - boundries.left);
-
-                    return CustomPaint(
-                      painter: MapPainter(layer: snapshot.data!.first),
-                      child: constraints.maxWidth * aspectRatio <
-                              constraints.maxHeight
-                          ? SizedBox(
-                              width: constraints.maxWidth,
-                              height: constraints.maxWidth * aspectRatio,
-                            )
-                          : SizedBox(
-                              width: constraints.maxHeight / aspectRatio,
-                              height: constraints.maxHeight,
-                            ),
+                    return MapWidget(
+                      mapLayers: snapshot.data!,
+                      constraints: constraints,
                     );
                   },
-                ),
-              ),
-            ),
-          );
-        }
+                );
+              }
 
-        if (snapshot.hasError) {
-          Logger.error(snapshot.error);
-          return const Center(
-            child: Text('Ups! Coś poszło nie tak!'),
-          );
-        }
+              if (snapshot.hasError) {
+                Logger.error(snapshot.error);
+                return const Center(
+                  child: Text('Ups! Coś poszło nie tak!'),
+                );
+              }
 
-        return const Center(
-          child: CircularProgressIndicator(),
-        );
-      },
+              Logger.warning('loading');
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

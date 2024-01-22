@@ -1,33 +1,16 @@
-import 'package:flutter/services.dart';
-
-import 'map_element.dart';
+import 'dart:ui';
 
 class MapLayer {
   MapLayer({
     required this.walls,
-  }) {
-    var minX = double.maxFinite;
-    var minY = double.maxFinite;
-    var maxX = -double.maxFinite;
-    var maxY = -double.maxFinite;
+    required this.doors,
+    required this.blocked,
+    required this.map,
+  });
 
-    for (final wall in walls) {
-      if (wall.constraints.left < minX) {
-        minX = wall.constraints.left;
-      }
-      if (wall.constraints.right > maxX) {
-        maxX = wall.constraints.right;
-      }
-      if (wall.constraints.top < minY) {
-        minY = wall.constraints.top;
-      }
-      if (wall.constraints.bottom > maxY) {
-        maxY = wall.constraints.bottom;
-      }
-    }
-    constraints = Rect.fromLTRB(minX, minY, maxX, maxY);
-  }
+  final Path walls;
+  final Path doors;
+  final Path blocked;
 
-  final List<MapElemnent> walls;
-  late final Rect constraints;
+  final Image map;
 }

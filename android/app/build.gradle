@@ -78,6 +78,7 @@ flutter {
 
 
 dependencies {
+    // import unity
     implementation project(':unityLibrary')
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
