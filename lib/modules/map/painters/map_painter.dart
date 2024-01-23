@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 
@@ -7,16 +8,15 @@ class MapPainter extends CustomPainter {
   MapPainter({
     required this.walls,
     required this.doors,
+    required this.image,
     required this.offset,
     required this.scale,
     this.path,
-  }) {
-    print(offset);
-    print(scale);
-  }
+  });
 
   final Path walls;
   final Path doors;
+  final ui.Image image;
   final Offset offset;
   final double scale;
   final List<Offset>? path;
@@ -65,12 +65,12 @@ class MapPainter extends CustomPainter {
     if (path?.isNotEmpty ?? false) {
       canvas
         ..drawCircle(
-          path!.first, // * scale - offset * scale,
+          path!.first * scale - offset * scale,
           4,
           pathPaint,
         )
         ..drawCircle(
-          path!.last, // * scale - offset * scale,
+          path!.last * scale - offset * scale,
           4,
           pathPaint,
         );

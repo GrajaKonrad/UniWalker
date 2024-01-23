@@ -73,11 +73,10 @@ class _MapWidgetState extends State<MapWidget> {
                     painter: MapPainter(
                       walls: widget.mapLayers[_layerIndex].walls,
                       doors: widget.mapLayers[_layerIndex].doors,
+                      image: widget.mapLayers[_layerIndex].image,
                       offset: _mapOffset,
                       scale: _mapScale,
-                      path: _start != null && _end != null
-                          ? [_start!, _end!]
-                          : null,
+                      path: _path,
                     ),
                   ),
                 );

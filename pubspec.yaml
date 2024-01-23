@@ -11,6 +11,7 @@ dependencies:
   auto_route: ^7.8.0
   bloc: ^8.1.2
   camera: ^0.10.5+5
+  collection: ^1.18.0
   csv: ^5.1.1
   cupertino_icons: ^1.0.2
   equatable: ^2.0.5
