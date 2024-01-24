@@ -1,3 +1,3 @@
 export 'device.dart';
-export 'map_layer.dart';
+export 'map/entities.dart';
 export 'point.dart';

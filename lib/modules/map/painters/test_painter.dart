@@ -1,49 +1,52 @@
-import 'dart:ui' as ui;
+import 'dart:typed_data';
 
+import 'package:delaunay/delaunay.dart';
 import 'package:flutter/material.dart';
 
 import '../../../ui/colors.dart';
 
 class TestPainter extends CustomPainter {
+  TestPainter({
+    required this.points,
+  });
+
+  final List<Offset> points;
+
   @override
   void paint(Canvas canvas, Size size) {
-    const p1 = Offset(10, 10);
-    final p2 = Offset(size.width - 10, size.height - 10);
-    final padding = _padding(p1, p2) * 5;
+    final rawPoints = Float32List(points.length * 2);
+    for (var i = 0; i < points.length; i++) {
+      rawPoints[i * 2] = points[i].dx;
+      rawPoints[i * 2 + 1] = points[i].dy;
+    }
 
-    final path = Path()
-      ..moveTo(p1.dx + padding.dx, p1.dy + padding.dy)
-      ..lineTo(p2.dx + padding.dx, p2.dy + padding.dy)
-      ..lineTo(p2.dx - padding.dx, p2.dy - padding.dy)
-      ..lineTo(p1.dx - padding.dx, p1.dy - padding.dy)
-      ..close();
-    final paint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = AppColors.black
-      ..shader = ui.Gradient.linear(
-        (p1 + p2) / 2 - padding,
-        (p1 + p2) / 2 + padding,
-        [
-          Colors.transparent,
-          const Color(0xffff0000),
-          Colors.transparent,
-        ],
-        [
-          0.0,
-          0.5,
-          1.0,
-        ],
+    final triangulation = Delaunay(rawPoints)..update();
+
+    for (var i = 0; i < triangulation.triangles.length; i += 3) {
+      final a = triangulation.triangles[i];
+      final b = triangulation.triangles[i + 1];
+      final c = triangulation.triangles[i + 2];
+
+      final path = Path()
+        ..moveTo(triangulation.coords[2 * a], triangulation.coords[2 * a + 1])
+        ..lineTo(triangulation.coords[2 * b], triangulation.coords[2 * b + 1])
+        ..lineTo(triangulation.coords[2 * c], triangulation.coords[2 * c + 1])
+        ..close();
+
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = AppColors.primary100
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1,
       );
+    }
 
-    canvas.drawPath(path, paint);
+    for (final point in points) {
+      canvas.drawCircle(point, 3, Paint()..color = AppColors.secondary400);
+    }
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
-
-  Offset _padding(Offset a, Offset b) {
-    final diff = a - b;
-    final tmp = diff / diff.distance;
-    return Offset(tmp.dy, -tmp.dx);
-  }
 }

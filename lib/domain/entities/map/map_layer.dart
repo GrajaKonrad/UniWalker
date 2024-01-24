@@ -1,10 +1,13 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'point.dart';
+import 'package:meta/meta.dart';
 
+import '../point.dart';
+
+@immutable
 class MapLayer {
-  MapLayer({
+  const MapLayer({
     required this.walls,
     required this.doors,
     required this.blocked,
@@ -18,10 +21,13 @@ class MapLayer {
   final Path doors;
   final Path blocked;
 
+  // pixel pathfinding
   final Image image;
   final Uint8List pixelList;
   final int pixelWidth;
   final int pixelHeight;
+
+  // navigaion graph
 
   Color getPixel(Point index) {
     if (index.x < 0 ||

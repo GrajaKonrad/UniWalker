@@ -5,7 +5,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/services.dart';
 
 import '../../domain/entities/entities.dart';
-import '../../domain/entities/map_element.dart';
+import '../../domain/entities/map/map_element.dart';
 import '../../domain/repositories/map_repository.dart';
 
 class MapRepositoryImpl implements MapRepository {
@@ -13,7 +13,7 @@ class MapRepositoryImpl implements MapRepository {
 
   @override
   Future<List<MapLayer>> getMap() async {
-    final json = (jsonDecode(await rootBundle.loadString('assets/map.json'))
+    final json = (jsonDecode(await rootBundle.loadString('assets/test.json'))
         as List<dynamic>)[0] as Map<String, dynamic>;
 
     final walls = Path();

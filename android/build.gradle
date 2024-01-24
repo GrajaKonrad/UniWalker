@@ -12,16 +12,16 @@ buildscript {
 }
 
 // import unity
-allprojects {
-    repositories {
-        flatDir {
-            dirs "${project(':unityLibrary').projectDir}/libs"
-        }
+// allprojects {
+//     repositories {
+//         flatDir {
+//             dirs "${project(':unityLibrary').projectDir}/libs"
+//         }
 
-        google()
-        mavenCentral()
-    }
-}
+//         google()
+//         mavenCentral()
+//     }
+// }
 
 rootProject.buildDir = '../build'
 subprojects {

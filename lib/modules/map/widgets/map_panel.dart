@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../domain/repositories/map_repository.dart';
 import '../../../logger.dart';
 import 'map_widget.dart';
+import 'triangulation.dart';
 
 class MapPanel extends StatelessWidget {
   const MapPanel({super.key});
@@ -26,6 +27,9 @@ class MapPanel extends StatelessWidget {
                 Logger.success('done');
                 return LayoutBuilder(
                   builder: (context, constraints) {
+                    return Triangulation(
+                      constraints: constraints,
+                    );
                     return MapWidget(
                       mapLayers: snapshot.data!,
                       constraints: constraints,
