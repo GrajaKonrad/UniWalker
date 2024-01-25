@@ -14,7 +14,7 @@ class MapWidget extends StatefulWidget {
     super.key,
   });
 
-  final List<MapLayer> mapLayers;
+  final List<Floor> mapLayers;
   final BoxConstraints constraints;
 
   @override
@@ -73,7 +73,7 @@ class _MapWidgetState extends State<MapWidget> {
                     painter: MapPainter(
                       walls: widget.mapLayers[_layerIndex].walls,
                       doors: widget.mapLayers[_layerIndex].doors,
-                      image: widget.mapLayers[_layerIndex].image,
+                      floor: widget.mapLayers[_layerIndex],
                       offset: _mapOffset,
                       scale: _mapScale,
                       path: _path,

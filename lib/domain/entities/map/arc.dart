@@ -1,15 +1,16 @@
-part of 'map_element.dart';
+part of 'shape.dart';
 
-final class Arc extends MapElement {
+@immutable
+final class Arc extends Shape {
   const Arc({
-    required this.center,
+    required this.origin,
     required this.radius,
     required this.startAngle,
     required this.endAngle,
   });
 
   factory Arc.fromJson(Map<String, dynamic> json) => Arc(
-        center: Offset(
+        origin: Offset(
           json['x'] as double,
           json['y'] as double,
         ),
@@ -18,7 +19,7 @@ final class Arc extends MapElement {
         endAngle: (json['endAngle'] as num) / 180.0 * pi,
       );
 
-  final Offset center;
+  final Offset origin;
   final double radius;
   final double startAngle;
   final double endAngle;
@@ -30,7 +31,7 @@ final class Arc extends MapElement {
     return path
       ..arcTo(
         Rect.fromCircle(
-          center: center,
+          center: origin,
           radius: radius,
         ),
         startAngle,
@@ -40,29 +41,53 @@ final class Arc extends MapElement {
   }
 
   @override
-  Path addWithPadding({
-    required Path path,
-    required double padding,
+  bool isIntersecting({
+    required Offset p1,
+    required Offset p2,
   }) {
-    return path
-      ..arcTo(
-        Rect.fromCircle(
-          center: center,
-          radius: radius + padding,
+    final a = origin;
+    final b = p1;
+    final c = p2;
+
+    final ba = Offset(b.dx - a.dx, b.dy - a.dy);
+    final ca = Offset(c.dx - a.dx, c.dy - a.dy);
+
+    final baLength = sqrt(ba.dx * ba.dx + ba.dy * ba.dy);
+    final caLength = sqrt(ca.dx * ca.dx + ca.dy * ca.dy);
+
+    final baNormalized = Offset(ba.dx / baLength, ba.dy / baLength);
+    final caNormalized = Offset(ca.dx / caLength, ca.dy / caLength);
+
+    final dot =
+        baNormalized.dx * caNormalized.dx + baNormalized.dy * caNormalized.dy;
+    final angle = acos(dot);
+
+    return angle < endAngle && angle > startAngle;
+  }
+
+  @override
+  List<Offset> get points {
+    final points = <Offset>[];
+    const step = 0.1;
+
+    for (var i = startAngle; i < endAngle; i += step) {
+      points.add(
+        Offset(
+          origin.dx + radius * cos(i),
+          origin.dy + radius * sin(i),
         ),
-        startAngle,
-        endAngle - startAngle,
-        true,
-      )
-      ..arcTo(
-        Rect.fromCircle(
-          center: center,
-          radius: radius - padding,
-        ),
-        endAngle,
-        startAngle - endAngle,
-        false,
-      )
-      ..close();
+      );
+    }
+
+    return points;
+  }
+
+  @override
+  Offset get center {
+    final x =
+        origin.dx + radius * cos(startAngle + (endAngle - startAngle) / 2);
+    final y =
+        origin.dy + radius * sin(startAngle + (endAngle - startAngle) / 2);
+    return Offset(x, y);
   }
 }

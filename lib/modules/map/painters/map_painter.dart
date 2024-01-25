@@ -1,14 +1,14 @@
-import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+import '../../../domain/entities/map/floor.dart';
 import '../../../ui/colors.dart';
 
 class MapPainter extends CustomPainter {
   MapPainter({
     required this.walls,
     required this.doors,
-    required this.image,
+    required this.floor,
     required this.offset,
     required this.scale,
     this.path,
@@ -16,7 +16,7 @@ class MapPainter extends CustomPainter {
 
   final Path walls;
   final Path doors;
-  final ui.Image image;
+  final Floor floor;
   final Offset offset;
   final double scale;
   final List<Offset>? path;
@@ -38,10 +38,14 @@ class MapPainter extends CustomPainter {
       ..color = AppColors.secondary300
       ..strokeWidth = 1;
 
+    final graphPaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..color = AppColors.grayscale200
+      ..strokeWidth = .5;
+
     canvas
       ..drawPath(
         walls.transform(
-          // Matrix4.identity().storage,
           Matrix4.compose(
             Vector3(-offset.dx, -offset.dy, 0) * scale,
             Quaternion.identity(),
@@ -52,7 +56,6 @@ class MapPainter extends CustomPainter {
       )
       ..drawPath(
         doors.transform(
-          // Matrix4.identity().storage,
           Matrix4.compose(
             Vector3(-offset.dx, -offset.dy, 0) * scale,
             Quaternion.identity(),
@@ -61,6 +64,36 @@ class MapPainter extends CustomPainter {
         ),
         doorPaint,
       );
+
+    // for (final e in floor.graph.entries) {
+    //   for (final n in e.value) {
+    //     canvas.drawLine(
+    //       e.key * scale - offset * scale,
+    //       n * scale - offset * scale,
+    //       graphPaint,
+    //     );
+    //   }
+    // }
+
+    for (final e in floor.triangles) {
+      canvas
+        ..drawLine(
+          (e.a - offset) * scale,
+          (e.b - offset) * scale,
+          graphPaint,
+        )
+        ..drawLine(
+          (e.b - offset) * scale,
+          (e.c - offset) * scale,
+          graphPaint,
+        )
+        ..drawLine(
+          (e.c - offset) * scale,
+          (e.a - offset) * scale,
+          graphPaint,
+        )
+        ..drawCircle((e.center - offset) * scale, 5, doorPaint);
+    }
 
     if (path?.isNotEmpty ?? false) {
       canvas

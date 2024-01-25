@@ -7,13 +7,13 @@ part 'arc.dart';
 part 'line.dart';
 
 @immutable
-sealed class MapElement {
-  const MapElement();
+sealed class Shape {
+  const Shape();
 
-  /// Creates a [MapElement] from the given json.
+  /// Creates a [Shape] from the given json.
   /// Throws an [Exception] if the type is not supported.
   /// Supported types are: [Line], [Arc]
-  static MapElement fromJson(Map<String, dynamic> json) {
+  static Shape fromJson(Map<String, dynamic> json) {
     return switch (json['type']) {
       'line' => Line.fromJson(json),
       'arc' => Arc.fromJson(json),
@@ -32,9 +32,6 @@ sealed class MapElement {
     required Offset p2,
   });
 
-  // pixel pathfinding
-  Path addWithPadding({
-    required Path path,
-    required double padding,
-  });
+  List<Offset> get points;
+  Offset get center;
 }

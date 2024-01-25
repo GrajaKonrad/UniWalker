@@ -5,10 +5,10 @@ import 'dart:ui';
 import '../entities/entities.dart';
 
 abstract interface class MapRepository {
-  Future<List<MapLayer>> getMap();
+  Future<List<Floor>> getMap();
 
   Future<List<Offset>> findPath({
-    required MapLayer layer,
+    required Floor layer,
     required Offset start,
     required Offset end,
   });
