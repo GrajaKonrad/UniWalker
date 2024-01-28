@@ -65,34 +65,34 @@ class MapPainter extends CustomPainter {
         doorPaint,
       );
 
-    // for (final e in floor.graph.entries) {
-    //   for (final n in e.value) {
-    //     canvas.drawLine(
-    //       e.key * scale - offset * scale,
-    //       n * scale - offset * scale,
-    //       graphPaint,
-    //     );
-    //   }
-    // }
+    for (final e in floor.graph.entries) {
+      for (final n in e.value) {
+        canvas.drawLine(
+          e.key * scale - offset * scale,
+          n * scale - offset * scale,
+          graphPaint,
+        );
+      }
+    }
 
     for (final e in floor.triangles) {
-      canvas
-        ..drawLine(
-          (e.a - offset) * scale,
-          (e.b - offset) * scale,
-          graphPaint,
-        )
-        ..drawLine(
-          (e.b - offset) * scale,
-          (e.c - offset) * scale,
-          graphPaint,
-        )
-        ..drawLine(
-          (e.c - offset) * scale,
-          (e.a - offset) * scale,
-          graphPaint,
-        )
-        ..drawCircle((e.center - offset) * scale, 5, doorPaint);
+      // canvas
+      //   ..drawLine(
+      //     (e.a - offset) * scale,
+      //     (e.b - offset) * scale,
+      //     graphPaint,
+      //   )
+      //   ..drawLine(
+      //     (e.b - offset) * scale,
+      //     (e.c - offset) * scale,
+      //     graphPaint,
+      //   )
+      //   ..drawLine(
+      //     (e.c - offset) * scale,
+      //     (e.a - offset) * scale,
+      //     graphPaint,
+      //   )
+      //   ..drawCircle((e.center - offset) * scale, 5, doorPaint);
     }
 
     if (path?.isNotEmpty ?? false) {

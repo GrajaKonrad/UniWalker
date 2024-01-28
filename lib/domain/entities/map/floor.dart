@@ -51,7 +51,7 @@ class Floor {
       );
 
       final triangle = Triangle(a: p1, b: p2, c: p3);
-      if (triangle.area() < 100) {
+      if (triangle.area() < 10000) {
         continue;
       }
 
@@ -68,6 +68,10 @@ class Floor {
     for (final a in nodes) {
       graph[a] = <Offset>[];
       for (final b in nodes) {
+        if ((a - b).distanceSquared >= 20 * 20 * 100 * 100) {
+          continue;
+        }
+
         if (!walls.any((e) => e.isIntersecting(p1: a, p2: b))) {
           graph[a]!.add(b);
         }

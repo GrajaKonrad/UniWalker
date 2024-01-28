@@ -24,6 +24,9 @@ final class Arc extends Shape {
   final double startAngle;
   final double endAngle;
 
+  static const _resolution = 0.01;
+  static const _default = 4;
+
   @override
   Path add({
     required Path path,
@@ -45,30 +48,69 @@ final class Arc extends Shape {
     required Offset p1,
     required Offset p2,
   }) {
-    final a = origin;
-    final b = p1;
-    final c = p2;
+    // Translate the line and circle so that the circle's center is at the origin
+    final p1t = p1 - origin;
+    final p2t = p2 - origin;
 
-    final ba = Offset(b.dx - a.dx, b.dy - a.dy);
-    final ca = Offset(c.dx - a.dx, c.dy - a.dy);
+    // Compute the line's direction vector
+    final d = p2t - p1t;
 
-    final baLength = sqrt(ba.dx * ba.dx + ba.dy * ba.dy);
-    final caLength = sqrt(ca.dx * ca.dx + ca.dy * ca.dy);
+    // Compute the coefficients of the quadratic equation
+    final a = d.dx * d.dx + d.dy * d.dy;
+    final b = 2 * (p1t.dx * d.dx + p1t.dy * d.dy);
+    final c = p1t.dx * p1t.dx + p1t.dy * p1t.dy - radius * radius;
 
-    final baNormalized = Offset(ba.dx / baLength, ba.dy / baLength);
-    final caNormalized = Offset(ca.dx / caLength, ca.dy / caLength);
+    // Compute the discriminant
+    final disc = b * b - 4 * a * c;
 
-    final dot =
-        baNormalized.dx * caNormalized.dx + baNormalized.dy * caNormalized.dy;
-    final angle = acos(dot);
+    // If the discriminant is negative, the line does not intersect the circle
+    if (disc < 0) {
+      return false;
+    }
 
-    return angle < endAngle && angle > startAngle;
+    // Compute the two solutions of the quadratic equation
+    final t1 = (-b - sqrt(disc)) / (2 * a);
+    final t2 = (-b + sqrt(disc)) / (2 * a);
+
+    // Check if the intersection points are within the arc's angles
+    bool checkAngle(Offset p) {
+      final angle = atan2(p.dy, p.dx);
+      if (startAngle < endAngle) {
+        return startAngle <= angle && angle <= endAngle;
+      } else {
+        return startAngle >= angle && angle >= endAngle;
+      }
+    }
+
+    // If either of the intersection points is within the line segment and the arc's angles, return true
+    if (0 <= t1 && t1 <= 1 && checkAngle(p1t + d * t1)) {
+      return true;
+    }
+    if (0 <= t2 && t2 <= 1 && checkAngle(p1t + d * t2)) {
+      return true;
+    }
+
+    // Otherwise, the line does not intersect the arc
+    return false;
   }
 
   @override
   List<Offset> get points {
     final points = <Offset>[];
-    const step = 0.1;
+
+    var angle = endAngle - startAngle;
+    if (angle < 0) {
+      angle += 2 * pi;
+    }
+
+    final target = (_default + _resolution * radius) * angle / (2 * pi);
+    if (target == 0) {
+      return points;
+    }
+
+    final step = 1 / target;
+
+    print('angle: $angle, step: $step');
 
     for (var i = startAngle; i < endAngle; i += step) {
       points.add(
