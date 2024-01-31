@@ -206,7 +206,7 @@ class BeaconRepositoryImpl implements BeconRepository {
   int _iterator = 0;
   @override
   (double, double, int, double, bool) deviceLocation(
-      {double mapScale = 1, int defaultN = 3}) {
+      {double mapScale = 1, int defaultN = 4}) {
     //returns
     _defaultN = defaultN;
     double userPosX = 0;
