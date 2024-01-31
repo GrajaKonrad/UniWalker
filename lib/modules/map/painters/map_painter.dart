@@ -25,8 +25,8 @@ class MapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final wallPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = AppColors.primary300
-      ..strokeWidth = 1;
+      ..color = AppColors.secondary300
+      ..strokeWidth = 1.5;
 
     final doorPaint = Paint()
       ..style = PaintingStyle.stroke
@@ -40,7 +40,7 @@ class MapPainter extends CustomPainter {
 
     final graphPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = AppColors.grayscale200
+      ..color = AppColors.grayscale300
       ..strokeWidth = .5;
 
     canvas
@@ -70,29 +70,36 @@ class MapPainter extends CustomPainter {
         canvas.drawLine(
           e.key * scale - offset * scale,
           n * scale - offset * scale,
-          graphPaint,
+          Paint()
+            ..strokeWidth = 0.4
+            ..color = AppColors.primary100,
         );
       }
+
+      canvas.drawCircle(
+        (e.key - offset) * scale,
+        2,
+        Paint()..color = AppColors.primary300,
+      );
     }
 
     for (final e in floor.triangles) {
-      // canvas
-      //   ..drawLine(
-      //     (e.a - offset) * scale,
-      //     (e.b - offset) * scale,
-      //     graphPaint,
-      //   )
-      //   ..drawLine(
-      //     (e.b - offset) * scale,
-      //     (e.c - offset) * scale,
-      //     graphPaint,
-      //   )
-      //   ..drawLine(
-      //     (e.c - offset) * scale,
-      //     (e.a - offset) * scale,
-      //     graphPaint,
-      //   )
-      //   ..drawCircle((e.center - offset) * scale, 5, doorPaint);
+      canvas
+        ..drawLine(
+          (e.a - offset) * scale,
+          (e.b - offset) * scale,
+          graphPaint,
+        )
+        ..drawLine(
+          (e.b - offset) * scale,
+          (e.c - offset) * scale,
+          graphPaint,
+        )
+        ..drawLine(
+          (e.c - offset) * scale,
+          (e.a - offset) * scale,
+          graphPaint,
+        );
     }
 
     if (path?.isNotEmpty ?? false) {

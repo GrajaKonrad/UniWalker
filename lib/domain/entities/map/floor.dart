@@ -62,17 +62,23 @@ class Floor {
     for (final doorJson in json['doors'] as List<dynamic>) {
       final door = Shape.fromJson(doorJson as Map<String, dynamic>);
       doors.add(door);
-      nodes.add(door.center);
+      final (a, b) = door.centerPoints;
+      nodes
+        ..add(a)
+        ..add(b);
+      graph.putIfAbsent(a, () => <Offset>[]).add(b);
+      graph.putIfAbsent(b, () => <Offset>[]).add(a);
     }
 
     for (final a in nodes) {
-      graph[a] = <Offset>[];
+      graph.putIfAbsent(a, () => <Offset>[]);
       for (final b in nodes) {
         if ((a - b).distanceSquared >= 20 * 20 * 100 * 100) {
           continue;
         }
 
-        if (!walls.any((e) => e.isIntersecting(p1: a, p2: b))) {
+        if (!walls.any((e) => e.isIntersecting(p1: a, p2: b)) &&
+            !doors.any((e) => e.isIntersecting(p1: a, p2: b))) {
           graph[a]!.add(b);
         }
       }

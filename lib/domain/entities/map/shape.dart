@@ -21,6 +21,8 @@ sealed class Shape {
     };
   }
 
+  static const doorPointsOffset = 50.0;
+
   /// Adds the shape to the given path.
   Path add({
     required Path path,
@@ -33,5 +35,5 @@ sealed class Shape {
   });
 
   List<Offset> get points;
-  Offset get center;
+  (Offset, Offset) get centerPoints;
 }

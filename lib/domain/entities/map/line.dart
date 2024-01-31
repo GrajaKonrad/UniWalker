@@ -63,8 +63,18 @@ final class Line extends Shape {
   List<Offset> get points => [p1, p2];
 
   @override
-  Offset get center => Offset(
-        (p1.dx + p2.dx) / 2,
-        (p1.dy + p2.dy) / 2,
-      );
+  (Offset, Offset) get centerPoints {
+    final dx = (p1.dx + p2.dx) / 2;
+    final dy = (p1.dy + p2.dy) / 2;
+    final angle = atan2(p2.dy - p1.dy, p2.dx - p1.dx);
+    final closerPoint = Offset(
+      dx + Shape.doorPointsOffset * cos(angle + pi / 2),
+      dy + Shape.doorPointsOffset * sin(angle + pi / 2),
+    );
+    final fartherPoint = Offset(
+      dx + Shape.doorPointsOffset * cos(angle - pi / 2),
+      dy + Shape.doorPointsOffset * sin(angle - pi / 2),
+    );
+    return (closerPoint, fartherPoint);
+  }
 }

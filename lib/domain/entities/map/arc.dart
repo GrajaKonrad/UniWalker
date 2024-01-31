@@ -74,11 +74,15 @@ final class Arc extends Shape {
 
     // Check if the intersection points are within the arc's angles
     bool checkAngle(Offset p) {
-      final angle = atan2(p.dy, p.dx);
+      var angle = atan2(p.dy, p.dx);
+      if (angle < 0) {
+        angle += 2 * pi;
+      }
+
       if (startAngle < endAngle) {
         return startAngle <= angle && angle <= endAngle;
       } else {
-        return startAngle >= angle && angle >= endAngle;
+        return startAngle >= angle || angle >= endAngle;
       }
     }
 
@@ -125,11 +129,16 @@ final class Arc extends Shape {
   }
 
   @override
-  Offset get center {
-    final x =
-        origin.dx + radius * cos(startAngle + (endAngle - startAngle) / 2);
-    final y =
-        origin.dy + radius * sin(startAngle + (endAngle - startAngle) / 2);
-    return Offset(x, y);
+  (Offset, Offset) get centerPoints {
+    final angle = startAngle + (endAngle - startAngle) / 2;
+    final closerPoint = Offset(
+      origin.dx + (radius - Shape.doorPointsOffset) * cos(angle),
+      origin.dy + (radius - Shape.doorPointsOffset) * sin(angle),
+    );
+    final fartherPoint = Offset(
+      origin.dx + (radius + Shape.doorPointsOffset) * cos(angle),
+      origin.dy + (radius + Shape.doorPointsOffset) * sin(angle),
+    );
+    return (closerPoint, fartherPoint);
   }
 }
