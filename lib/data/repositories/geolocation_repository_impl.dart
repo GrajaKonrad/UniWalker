@@ -25,26 +25,10 @@ Future<Position> _determinePosition() async {
   return await Geolocator.getCurrentPosition();
 }
 
-Future<(double, double)> calculateGeolocationPosition(double mapStartX, double mapStartY,double mapEndX, double mapEndY, double mapScale)
+Future<(double, double)> calculateGeolocationPosition(double mapStartX, double mapStartY, double mapScale)
 async {
   Position currentPosition =  await _determinePosition();
   double posX = (currentPosition.latitude - mapStartX) * mapScale;
   double posY = (currentPosition.longitude - mapStartY) * mapScale;
-  if(currentPosition.latitude < mapStartX)
-  {
-      posX = 0;
-  }
-  if(currentPosition.longitude < mapStartY)
-  {
-    posY = 0;
-  }
-  if(currentPosition.latitude > mapEndX)
-  {
-    posX = mapEndX * mapScale;
-  }
-  if(currentPosition.longitude > mapEndY)
-  {
-    posY = mapEndY * mapScale;
-  }
   return (posX, posY);
 }

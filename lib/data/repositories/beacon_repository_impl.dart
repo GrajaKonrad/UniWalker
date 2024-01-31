@@ -268,7 +268,7 @@ class BeaconRepositoryImpl implements BeconRepository {
             x1, y1, realDistance[i], x2, y2, realDistance[j]));
         // if circles radius is too small both are sized up in the same proportion to previous size
         int addToN = -1;
-        while (_flagIntersectUp && defaultN + addToN > 0) {
+        while (_flagIntersectUp && defaultN + addToN > 3) {
           //print("Step-up distance");
           _flagIntersectUp = false;
           num newDistance1 = _calculateRealDistance(
@@ -285,7 +285,7 @@ class BeaconRepositoryImpl implements BeconRepository {
         }
         // if circles radius is too big both are sized down in the same proportion to previous size
         addToN = 1;
-        while (_flagIntersectDown && defaultN + addToN < 5) {
+        while (_flagIntersectDown && defaultN + addToN < 4) {
           //print("Step-down distance");
           _flagIntersectDown = false;
           num newDistance1 = _calculateRealDistance(
