@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 
+import 'data/api/assers_api_impl.dart';
 import 'data/repositories/beacon_repository_impl.dart';
 import 'data/repositories/map_repository_impl.dart';
-import 'domain/repositories/beacon_repository.dart';
 import 'domain/repositories/map_repository.dart';
 import 'domain/use_cases/beacon_use_case.dart';
 import 'router/app_router.dart';
@@ -16,14 +16,15 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-  final BeconRepository beconRepository = BeconRepositoryImpl();
+  final assetsApi = AssetsApiImpl();
+  final beaconRepository = BeaconRepositoryImpl(assetsApi: assetsApi);
 
   await Future.wait([
-    beconRepository.initi(),
+    beaconRepository.initi(),
   ]);
 
-  final beconUseCase = BeconUseCase(
-    beconRepository: beconRepository,
+  final beconUseCase = BeaconUseCase(
+    beaconRepository: beaconRepository,
   );
 
   final mapRepository = MapRepositoryImpl();
@@ -38,14 +39,15 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({
-    required BeconUseCase beconUseCase,
+    required BeaconUseCase beconUseCase,
     required MapRepository mapRepository,
     super.key,
   })  : _mapRepository = mapRepository,
         _beconUseCase = beconUseCase;
 
-  final BeconUseCase _beconUseCase;
+  final BeaconUseCase _beconUseCase;
   final MapRepository _mapRepository;
+
   final _appRouter = AppRouter();
 
   @override

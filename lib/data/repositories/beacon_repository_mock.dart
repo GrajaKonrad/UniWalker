@@ -26,4 +26,8 @@ class BeconRepositoryMock implements BeconRepository {
 
   @override
   Future<void> stopScan() async {}
+
+  @override
+  (double, double, int, double, bool) deviceLocation()
+  {return (0, 0 ,0, 1, false);}
 }

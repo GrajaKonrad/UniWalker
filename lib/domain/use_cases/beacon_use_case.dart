@@ -3,14 +3,15 @@ import 'package:rxdart/rxdart.dart';
 import '../entities/device.dart';
 import '../repositories/beacon_repository.dart';
 
-class BeconUseCase {
-  BeconUseCase({
-    required BeconRepository beconRepository,
-  }) : _beconRepository = beconRepository;
+class BeaconUseCase {
+  BeaconUseCase({
+    required BeconRepository beaconRepository,
+  }) : _beaconRepository = beaconRepository;
 
-  final BeconRepository _beconRepository;
+  final BeconRepository _beaconRepository;
 
-  ValueStream<List<Device>> get deviceStream => _beconRepository.deviceStream;
-  Future<void> startScan() => _beconRepository.startScan();
-  Future<void> stopScan() => _beconRepository.stopScan();
+  ValueStream<List<Device>> get deviceStream => _beaconRepository.deviceStream;
+  Future<void> startScan() => _beaconRepository.startScan();
+  Future<void> stopScan() => _beaconRepository.stopScan();
+  (double, double, int, double, bool) deviceLocation() => _beaconRepository.deviceLocation();
 }

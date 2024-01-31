@@ -11,11 +11,11 @@ part 'device_list_state.dart';
 
 class DeviceListCubit extends Cubit<DeviceListState> {
   DeviceListCubit({
-    required BeconUseCase beconUseCase,
+    required BeaconUseCase beconUseCase,
   })  : _beconUseCase = beconUseCase,
         super(const DeviceListLoadingState());
 
-  final BeconUseCase _beconUseCase;
+  final BeaconUseCase _beconUseCase;
   StreamSubscription<List<Device>>? _subscription;
 
   Future<void> init() async {
@@ -33,5 +33,6 @@ class DeviceListCubit extends Cubit<DeviceListState> {
 
   void _onData(List<Device> devices) {
     emit(DeviceListLoadedState(devices: devices));
+    _beconUseCase.deviceLocation();
   }
 }
