@@ -13,14 +13,14 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-  BeconRepository beconRepository = BeconRepositoryImpl();
+  BeconRepository beconRepository = BeaconRepositoryImpl();
 
   await Future.wait([
     beconRepository.initi(),
   ]);
 
-  BeconUseCase beconUseCase = BeconUseCase(
-    beconRepository: beconRepository,
+  BeaconUseCase beconUseCase = BeaconUseCase(
+    beaconRepository: beconRepository,
   );
 
   runApp(MyApp(
@@ -30,11 +30,11 @@ Future<void> main() async {
 
 class MyApp extends StatelessWidget {
   MyApp({
-    required BeconUseCase beconUseCase,
+    required BeaconUseCase beconUseCase,
     super.key,
   }) : _beconUseCase = beconUseCase;
 
-  final BeconUseCase _beconUseCase;
+  final BeaconUseCase _beconUseCase;
   final _appRouter = AppRouter();
 
   @override
