@@ -114,8 +114,6 @@ final class Arc extends Shape {
 
     final step = 1 / target;
 
-    print('angle: $angle, step: $step');
-
     for (var i = startAngle; i < endAngle; i += step) {
       points.add(
         Offset(

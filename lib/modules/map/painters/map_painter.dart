@@ -25,23 +25,18 @@ class MapPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final wallPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = AppColors.secondary300
-      ..strokeWidth = 1.5;
+      ..color = AppColors.secondary400
+      ..strokeWidth = 1.0;
 
     final doorPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = AppColors.secondary300
+      ..color = AppColors.primary100
       ..strokeWidth = 0.5;
 
     final pathPaint = Paint()
       ..style = PaintingStyle.stroke
-      ..color = AppColors.secondary300
-      ..strokeWidth = 1;
-
-    final graphPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..color = AppColors.grayscale300
-      ..strokeWidth = .5;
+      ..color = AppColors.primary600
+      ..strokeWidth = 1.5;
 
     canvas
       ..drawPath(
@@ -65,56 +60,7 @@ class MapPainter extends CustomPainter {
         doorPaint,
       );
 
-    for (final e in floor.graph.entries) {
-      for (final n in e.value) {
-        canvas.drawLine(
-          e.key * scale - offset * scale,
-          n * scale - offset * scale,
-          Paint()
-            ..strokeWidth = 0.4
-            ..color = AppColors.primary100,
-        );
-      }
-
-      canvas.drawCircle(
-        (e.key - offset) * scale,
-        2,
-        Paint()..color = AppColors.primary300,
-      );
-    }
-
-    for (final e in floor.triangles) {
-      canvas
-        ..drawLine(
-          (e.a - offset) * scale,
-          (e.b - offset) * scale,
-          graphPaint,
-        )
-        ..drawLine(
-          (e.b - offset) * scale,
-          (e.c - offset) * scale,
-          graphPaint,
-        )
-        ..drawLine(
-          (e.c - offset) * scale,
-          (e.a - offset) * scale,
-          graphPaint,
-        );
-    }
-
     if (path?.isNotEmpty ?? false) {
-      canvas
-        ..drawCircle(
-          path!.first * scale - offset * scale,
-          4,
-          pathPaint,
-        )
-        ..drawCircle(
-          path!.last * scale - offset * scale,
-          4,
-          pathPaint,
-        );
-
       for (var i = 0; i < path!.length - 1; i++) {
         canvas.drawLine(
           path![i] * scale - offset * scale,
@@ -122,6 +68,21 @@ class MapPainter extends CustomPainter {
           pathPaint,
         );
       }
+      canvas
+        ..drawCircle(
+          path!.first * scale - offset * scale,
+          3,
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = AppColors.primary600,
+        )
+        ..drawCircle(
+          path!.last * scale - offset * scale,
+          6,
+          Paint()
+            ..style = PaintingStyle.fill
+            ..color = AppColors.secondary700,
+        );
     }
   }
 

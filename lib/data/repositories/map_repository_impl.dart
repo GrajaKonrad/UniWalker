@@ -28,16 +28,21 @@ class MapRepositoryImpl implements MapRepository {
       (a, b) => fScore[a]!.compareTo(fScore[b]!),
     );
 
-    final startNode = layer.graph.keys.firstWhereOrNull((e) => e == start) ??
-        layer.triangles.firstWhere((e) => e.isPointInside(start)).center;
-
     final endNode = layer.graph.keys.firstWhereOrNull((e) => e == end) ??
         layer.triangles.firstWhere((e) => e.isPointInside(end)).center;
 
-    gScore[startNode] = 0;
-    fScore[endNode] = _heuristicCostEstimate(startNode, endNode);
+    gScore[start] = 0;
+    fScore[endNode] = _heuristicCostEstimate(start, endNode);
 
-    openSet.add(startNode);
+    // insert artificial edges
+    for (final node in layer.graph.keys) {
+      if (!layer.obstacles.any((e) => e.isIntersecting(p1: start, p2: node))) {
+        cameFrom[node] = start;
+        gScore[node] = _distBetween(start, node);
+        fScore[node] = _heuristicCostEstimate(node, endNode);
+        openSet.add(node);
+      }
+    }
 
     while (openSet.isNotEmpty) {
       final current = openSet.removeFirst();
@@ -60,7 +65,7 @@ class MapRepositoryImpl implements MapRepository {
       }
     }
 
-    return Future.value([]);
+    return Future.value(<Offset>[]);
   }
 
   double _heuristicCostEstimate(Offset a, Offset b) {

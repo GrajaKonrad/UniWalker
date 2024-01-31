@@ -1,10 +1,10 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../domain/entities/entities.dart';
-import '../../../domain/repositories/map_repository.dart';
+import '../cubit/map_cubit.dart';
 import '../painters/map_painter.dart';
 
 class MapWidget extends StatefulWidget {
@@ -29,11 +29,6 @@ class _MapWidgetState extends State<MapWidget> {
   Offset _mapOffset = Offset.zero;
   double _mapScale = 1;
 
-  Offset? _start;
-  Offset? _end;
-
-  List<Offset>? _path;
-
   @override
   void initState() {
     super.initState();
@@ -48,58 +43,38 @@ class _MapWidgetState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (details) => _setStart(
-        _transformationController.toScene(
-          details.localPosition,
-        ),
-      ),
-      onDoubleTapDown: (details) => _setEnd(
-        _transformationController.toScene(
-          details.localPosition,
-        ),
-      ),
-      child: InteractiveViewer(
-        transformationController: _transformationController,
-        child: Padding(
-          padding: const EdgeInsets.all(_padding),
-          child: Center(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                return SizedBox(
-                  width: double.maxFinite,
-                  height: double.maxFinite,
-                  child: CustomPaint(
-                    painter: MapPainter(
-                      walls: widget.mapLayers[_layerIndex].walls,
-                      doors: widget.mapLayers[_layerIndex].doors,
-                      floor: widget.mapLayers[_layerIndex],
-                      offset: _mapOffset,
-                      scale: _mapScale,
-                      path: _path,
+    return BlocBuilder<MapCubit, MapState>(
+      builder: (context, state) {
+        final path = state is MapLoaded ? state.path : null;
+
+        return InteractiveViewer(
+          transformationController: _transformationController,
+          child: Padding(
+            padding: const EdgeInsets.all(_padding),
+            child: Center(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  return SizedBox(
+                    width: double.maxFinite,
+                    height: double.maxFinite,
+                    child: CustomPaint(
+                      painter: MapPainter(
+                        walls: widget.mapLayers[_layerIndex].walls,
+                        doors: widget.mapLayers[_layerIndex].doors,
+                        floor: widget.mapLayers[_layerIndex],
+                        offset: _mapOffset,
+                        scale: _mapScale,
+                        path: path,
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
-  }
-
-  void _setStart(Offset offset) {
-    setState(() {
-      _start = offset - const Offset(_padding, _padding);
-      _findPath();
-    });
-  }
-
-  void _setEnd(Offset offset) {
-    setState(() {
-      _end = offset - const Offset(_padding, _padding);
-      _findPath();
-    });
   }
 
   void _setLayer(int index) {
@@ -112,28 +87,6 @@ class _MapWidgetState extends State<MapWidget> {
       );
       _mapOffset = bounds.topLeft;
       _layerIndex = index;
-    });
-  }
-
-  Future<void> _findPath() async {
-    if (_start == null || _end == null) {
-      return _path = null;
-    }
-
-    final start = _start! / _mapScale + _mapOffset;
-    final end = _end! / _mapScale + _mapOffset;
-
-    final path = await context.read<MapRepository>().findPath(
-          layer: widget.mapLayers[_layerIndex],
-          start: start,
-          end: end,
-        );
-
-    if (!mounted) {
-      return;
-    }
-    setState(() {
-      _path = path;
     });
   }
 }

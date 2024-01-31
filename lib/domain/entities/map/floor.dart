@@ -5,6 +5,7 @@ import 'package:delaunay/delaunay.dart';
 import 'package:meta/meta.dart';
 
 import 'entities.dart';
+import 'room.dart';
 import 'shape.dart';
 
 @immutable
@@ -12,13 +13,16 @@ class Floor {
   const Floor({
     required this.walls,
     required this.doors,
+    required this.rooms,
     required this.triangles,
     required this.graph,
+    required this.obstacles,
   });
 
   factory Floor.fromJson(Map<String, dynamic> json) {
     final walls = <Shape>[];
     final doors = <Shape>[];
+    final rooms = <Room>[];
     final points = <Offset>{};
     final graph = <Offset, List<Offset>>{};
     final nodes = <Offset>[];
@@ -57,6 +61,12 @@ class Floor {
 
       triangles.add(triangle);
       nodes.add(triangle.center);
+    }
+
+    for (final roomJson in json['rooms'] as List<dynamic>) {
+      final room = Room.fromJson(roomJson as Map<String, dynamic>);
+      rooms.add(room);
+      nodes.add(Offset(room.x, room.y));
     }
 
     for (final doorJson in json['doors'] as List<dynamic>) {
@@ -98,13 +108,17 @@ class Floor {
     return Floor(
       walls: wallsPath,
       doors: doorsPath,
+      rooms: rooms,
       graph: graph,
       triangles: triangles,
+      obstacles: [...walls, ...doors],
     );
   }
 
   final Path walls;
   final Path doors;
+  final List<Room> rooms;
   final List<Triangle> triangles;
   final Map<Offset, List<Offset>> graph;
+  final List<Shape> obstacles;
 }
