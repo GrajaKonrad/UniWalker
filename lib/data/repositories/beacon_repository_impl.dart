@@ -116,6 +116,7 @@ class BeaconRepositoryImpl implements BeconRepository {
   late int _defaultN;
   List<double> lastKnownPosition = [0, 0];
   int lastKnownFloor = 0;
+  double lastLocalizationError = 0;
 
   num _calculateMetersFromRssi(double measuredRssi, num meterRssi,
       {int n = 3}) {
@@ -204,18 +205,20 @@ class BeaconRepositoryImpl implements BeconRepository {
 
   int _iterator = 0;
   @override
-  (double, double, int) deviceLocation(
+  (double, double, int, double, bool) deviceLocation(
       {double mapScale = 1, int defaultN = 3}) {
     //returns
     _defaultN = defaultN;
     double userPosX = 0;
     double userPosY = 0;
     int userFloor = 0;
+    double localizationError = 0;
+    bool noBeaconsFound = false;
 
     List<Device> foundBeacons = _deviceStreamController.value;
     if (_iterator < foundBeacons.length) {
       _iterator++;
-      return (lastKnownPosition[0], lastKnownPosition[1], lastKnownFloor);
+      return (lastKnownPosition[0], lastKnownPosition[1], lastKnownFloor, lastLocalizationError, true);
     } else {
       _iterator = 0;
     }
@@ -388,6 +391,11 @@ class BeaconRepositoryImpl implements BeconRepository {
       }
       userPosX /= 3;
       userPosY /= 3;
+
+      localizationError = sqrt(pow(
+          middlePoints[0][0] - userPosX, 2) +
+          pow(
+              middlePoints[0][1] - userPosY, 2));
     } else if (foundBeacons.length == 2) {
       //only two beacons found - Use last known position
       _flagIntersectUp = false;
@@ -475,19 +483,30 @@ class BeaconRepositoryImpl implements BeconRepository {
       if (distance <= newDistance) {
         userPosX = intersectionPoints[0][0].toDouble();
         userPosY = intersectionPoints[0][1].toDouble();
+
       } else {
         userPosX = intersectionPoints[0][2].toDouble();
         userPosY = intersectionPoints[0][3].toDouble();
       }
       userFloor = _knownBeacons[foundBeacons[0].id]?['Device_floor'] as int;
+      localizationError = sqrt(pow(
+          lastKnownPosition[0] - userPosX, 2) +
+          pow(
+              lastKnownPosition[1] - userPosY, 2));
+      localizationError += sqrt(pow(intersectionPoints[0][0] - intersectionPoints[0][2], 2) + pow(intersectionPoints[0][1] - intersectionPoints[0][3], 2));
+    } else {
+      userPosX = lastKnownPosition[0];
+      userPosY = lastKnownPosition[1];
+      localizationError = lastLocalizationError;
+      noBeaconsFound = true;
     }
-
     lastKnownPosition = [userPosX, userPosY];
     lastKnownFloor = userFloor;
+
     print(
-        "User position coordinates - X: $userPosX Y: $userPosY Floor: $userFloor");
+        "User position coordinates - X: $userPosX Y: $userPosY Floor: $userFloor Localization error: $localizationError");
     //X value, Y value, Floor number (from 0)
-    return (userPosX, userPosY, userFloor);
+    return (userPosX, userPosY, userFloor, localizationError, noBeaconsFound);
   }
 }
 

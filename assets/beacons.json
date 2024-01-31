@@ -25,5 +25,23 @@
     "Pos_y": 0,
     "Pos_z": 1.4,
     "Device_floor": 0
+  },
+  {
+    "Device_id": "DC:2C:6E:11:3C:D8",
+    "Name": "Anchor3",
+    "RSSI_at_1m": -55,
+    "Pos_x": 1.2,
+    "Pos_y": 0,
+    "Pos_z": 1.4,
+    "Device_floor": 0
+  },
+  {
+    "Device_id": "DC:2C:6E:11:37:BC",
+    "Name": "Anchor4",
+    "RSSI_at_1m": -56,
+    "Pos_x": 0,
+    "Pos_y": 0,
+    "Pos_z": 1.4,
+    "Device_floor": 0
   }
 ]

@@ -12,5 +12,5 @@ class BeaconUseCase {
   ValueStream<List<Device>> get deviceStream => _beaconRepository.deviceStream;
   Future<void> startScan() => _beaconRepository.startScan();
   Future<void> stopScan() => _beaconRepository.stopScan();
-  (double, double, int) deviceLocation() => _beaconRepository.deviceLocation();
+  (double, double, int, double, bool) deviceLocation() => _beaconRepository.deviceLocation();
 }
