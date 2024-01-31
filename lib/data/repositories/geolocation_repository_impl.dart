@@ -25,7 +25,7 @@ Future<Position> _determinePosition() async {
   return await Geolocator.getCurrentPosition();
 }
 
-Future<(double, double)> calculateGeoloactionPosition(double mapStartX, double mapStartY,double mapEndX, double mapEndY, double mapScale)
+Future<(double, double)> calculateGeolocationPosition(double mapStartX, double mapStartY,double mapEndX, double mapEndY, double mapScale)
 async {
   Position currentPosition =  await _determinePosition();
   double posX = (currentPosition.latitude - mapStartX) * mapScale;
