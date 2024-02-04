@@ -13,17 +13,17 @@ class MapLoading extends MapState {
 
 class MapLoaded extends MapState {
   const MapLoaded({
-    required this.floors,
+    required this.building,
     required this.path,
   });
 
-  final List<Floor> floors;
-  final List<Offset>? path;
+  final Building building;
+  final List<Position>? path;
 
   @override
   List<Object?> get props => [
         ...super.props,
-        floors,
+        building,
         path,
       ];
 }

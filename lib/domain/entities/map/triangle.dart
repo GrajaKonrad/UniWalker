@@ -5,19 +5,30 @@ import 'package:meta/meta.dart';
 
 @immutable
 class Triangle {
-  Triangle({
+  const Triangle({
     required this.a,
     required this.b,
     required this.c,
-  }) : center = _calculateIncenter(a, b, c);
+  });
 
   final Offset a;
   final Offset b;
   final Offset c;
 
-  final Offset center;
+  Offset get inscribedCircleCenter {
+    final ab = _distance(a, b);
+    final bc = _distance(b, c);
+    final ca = _distance(c, a);
 
-  double area() {
+    final p = ab + bc + ca;
+
+    return Offset(
+      (a.dx * bc + b.dx * ca + c.dx * ab) / p,
+      (a.dy * bc + b.dy * ca + c.dy * ab) / p,
+    );
+  }
+
+  double get area {
     final ab = _distance(a, b);
     final bc = _distance(b, c);
     final ca = _distance(c, a);
@@ -36,19 +47,6 @@ class Triangle {
     final hasPos = (d1 > 0) || (d2 > 0) || (d3 > 0);
 
     return !(hasNeg && hasPos);
-  }
-
-  static Offset _calculateIncenter(Offset a, Offset b, Offset c) {
-    final ab = _distance(a, b);
-    final bc = _distance(b, c);
-    final ca = _distance(c, a);
-
-    final p = ab + bc + ca;
-
-    return Offset(
-      (a.dx * bc + b.dx * ca + c.dx * ab) / p,
-      (a.dy * bc + b.dy * ca + c.dy * ab) / p,
-    );
   }
 
   static double _distance(Offset a, Offset b) {

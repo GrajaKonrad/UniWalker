@@ -23,7 +23,7 @@ class MapView extends StatelessWidget implements AutoRouteWrapper {
               title: const Text('Znajdź salę'),
             ),
             body: switch (state) {
-              final MapLoaded _ => MapPanel(floors: state.floors),
+              final MapLoaded _ => MapPanel(building: state.building),
               final MapLoading _ =>
                 const Center(child: CircularProgressIndicator()),
               final MapError _ => const Center(

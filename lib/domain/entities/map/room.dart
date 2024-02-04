@@ -8,14 +8,6 @@ class Room {
     required this.name,
   });
 
-  factory Room.fromJson(Map<String, dynamic> json) {
-    return Room(
-      x: json['x'] as double,
-      y: json['y'] as double,
-      name: json['name'] as String,
-    );
-  }
-
   final double x;
   final double y;
   final String name;

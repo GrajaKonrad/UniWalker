@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 import 'data/api/assers_api_impl.dart';
 import 'data/repositories/beacon_repository_impl.dart';
+import 'data/repositories/beacon_repository_mock.dart';
 import 'data/repositories/map_repository_impl.dart';
 import 'domain/repositories/map_repository.dart';
 import 'domain/use_cases/beacon_use_case.dart';
@@ -16,8 +17,9 @@ Future<void> main() async {
     DeviceOrientation.portraitUp,
   ]);
 
-  final assetsApi = AssetsApiImpl();
-  final beaconRepository = BeaconRepositoryImpl(assetsApi: assetsApi);
+  // final assetsApi = AssetsApiImpl();
+  // final beaconRepository = BeaconRepositoryImpl(assetsApi: assetsApi);
+  final beaconRepository = BeaconRepositoryMock();
 
   await Future.wait([
     beaconRepository.initi(),

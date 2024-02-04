@@ -9,12 +9,12 @@ import '../painters/map_painter.dart';
 
 class MapWidget extends StatefulWidget {
   const MapWidget({
-    required this.mapLayers,
+    required this.floor,
     required this.constraints,
     super.key,
   });
 
-  final List<Floor> mapLayers;
+  final Floor floor;
   final BoxConstraints constraints;
 
   @override
@@ -25,7 +25,6 @@ class _MapWidgetState extends State<MapWidget> {
   static const _padding = 16.0;
 
   final _transformationController = TransformationController();
-  int _layerIndex = 0;
   Offset _mapOffset = Offset.zero;
   double _mapScale = 1;
 
@@ -59,9 +58,7 @@ class _MapWidgetState extends State<MapWidget> {
                     height: double.maxFinite,
                     child: CustomPaint(
                       painter: MapPainter(
-                        walls: widget.mapLayers[_layerIndex].walls,
-                        doors: widget.mapLayers[_layerIndex].doors,
-                        floor: widget.mapLayers[_layerIndex],
+                        floor: widget.floor,
                         offset: _mapOffset,
                         scale: _mapScale,
                         path: path,
@@ -79,14 +76,13 @@ class _MapWidgetState extends State<MapWidget> {
 
   void _setLayer(int index) {
     setState(() {
-      final bounds = widget.mapLayers[index].walls.getBounds();
+      final bounds = widget.floor.walls.getBounds();
 
       _mapScale = min(
         (widget.constraints.maxWidth - 2 * _padding) / bounds.width,
         (widget.constraints.maxHeight - 2 * _padding) / bounds.height,
       );
       _mapOffset = bounds.topLeft;
-      _layerIndex = index;
     });
   }
 }

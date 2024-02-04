@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:vector_math/vector_math_64.dart';
 
-import '../../../domain/entities/map/floor.dart';
+import '../../../domain/entities/map/entities.dart';
 import '../../../ui/colors.dart';
 
 class MapPainter extends CustomPainter {
   MapPainter({
-    required this.walls,
-    required this.doors,
     required this.floor,
     required this.offset,
     required this.scale,
     this.path,
   });
 
-  final Path walls;
-  final Path doors;
   final Floor floor;
   final Offset offset;
   final double scale;
-  final List<Offset>? path;
+  final List<Position>? path;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -40,7 +36,7 @@ class MapPainter extends CustomPainter {
 
     canvas
       ..drawPath(
-        walls.transform(
+        floor.walls.transform(
           Matrix4.compose(
             Vector3(-offset.dx, -offset.dy, 0) * scale,
             Quaternion.identity(),
@@ -50,7 +46,7 @@ class MapPainter extends CustomPainter {
         wallPaint,
       )
       ..drawPath(
-        doors.transform(
+        floor.doors.transform(
           Matrix4.compose(
             Vector3(-offset.dx, -offset.dy, 0) * scale,
             Quaternion.identity(),
@@ -62,27 +58,36 @@ class MapPainter extends CustomPainter {
 
     if (path?.isNotEmpty ?? false) {
       for (var i = 0; i < path!.length - 1; i++) {
+        if (path![i + 1].level != floor.level) {
+          continue;
+        }
+
         canvas.drawLine(
-          path![i] * scale - offset * scale,
-          path![i + 1] * scale - offset * scale,
+          Offset(path![i].x, path![i].y) * scale - offset * scale,
+          Offset(path![i + 1].x, path![i + 1].y) * scale - offset * scale,
           pathPaint,
         );
       }
-      canvas
-        ..drawCircle(
-          path!.first * scale - offset * scale,
+
+      if (path?.first.level == floor.level) {
+        canvas.drawCircle(
+          Offset(path!.first.x, path!.first.y) * scale - offset * scale,
           3,
           Paint()
             ..style = PaintingStyle.fill
             ..color = AppColors.primary600,
-        )
-        ..drawCircle(
-          path!.last * scale - offset * scale,
+        );
+      }
+
+      if (path?.last.level == floor.level) {
+        canvas.drawCircle(
+          Offset(path!.last.x, path!.last.y) * scale - offset * scale,
           6,
           Paint()
             ..style = PaintingStyle.fill
             ..color = AppColors.secondary700,
         );
+      }
     }
   }
 
